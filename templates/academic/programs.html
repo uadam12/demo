@@ -1,0 +1,43 @@
+{% extends 'admin-base.html' %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mt-5">
+        <h1>Academic Programs</h1>
+
+        <a href="{% url 'academic:create-program' %}" class="btn btn-success">
+            <i class="fa fa-plus"></i> Create
+        </a>
+    </div>
+
+    <div class="table-responsive mb-5">
+        <table class="table table-bordered table-hover table-striped">
+            <tr>
+                <th>S/N</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+            
+            {% for program in programs %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ program }}</td>
+                <td>
+                    <a href="{% url 'academic:update-program' id=program.id %}" class="btn btn-warning">
+                        <i class="fa fa-pencil"></i>
+                    </a>
+            
+                    <a href="{% url 'academic:delete-program' id=program.id %}" class="btn btn-danger">
+                        <i class="fa fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center text-muted">
+                    There is no available program
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <h1 class="text-center text-primary">
+        Currently Open Scholarship
+    </h1>
+
+    <div class="row col-12 col-ms-6 col-md-4">
+    {% for scholarship in scholarships %}
+    <div class="card">
+        <div class="card-body">
+            <a href="{% url 'applicant:apply' id=scholarship.id %}" class="card-link">
+                {{ scholarship }}
+            </a>
+        </div>
+    </div>
+
+    {% empty %}
+    <div class="card mx-auto">
+        <div class="card-body">
+            <h3 class="card-title">
+                There is no open scholarship currently, please check back later.
+            </h3>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+    
+{% endblock %}

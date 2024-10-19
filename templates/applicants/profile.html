@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+
+{% block content %} {% load crispy_forms_tags %}
+<h1 class="text-center">Profile Details</h1>
+{% include "layouts/user-card.html" %}
+
+<div class='card mb-2'>
+    <div class="card-header">
+        <!-- Nav tabs -->
+        {% include "layouts/user-tabs.html" %}
+    </div>
+
+    <div class="card-body">
+        <div class='tab-content' hx-target="#message">
+            <!-- Tab panes -->
+            <div class="tab-pane active" id="personal">
+                <h2 class="text-center">Personal information</h2>
+                <hr>
+                <form 
+                    hx-post="{% url 'applicant:save-personal-info' %}" 
+                    id="personal-info-form"
+                >
+                    {% csrf_token %} 
+
+                    <div id="personal-info-form-body">
+                        {% crispy user_form %}
+                        {% crispy applicant_form %}
+                    </div>
+
+                    <p class="text-end">
+                        <button type="submit" class="btn btn-primary">Save Personal Information</button>
+                    </p>
+                </form>
+            </div>
+
+            <div class="tab-pane fade" id="academic">
+                <h2 class="text-center">Academic information</h2>
+                <hr>
+                {% crispy academic_form %}
+            </div>
+
+            <div class="tab-pane fade" id="account">
+                <h2 class="text-center">Bank Account Details</h2>
+                <hr>
+                {% crispy bank_form %}
+            </div>
+
+            <div class="tab-pane fade" id="documents">
+                <h2 class="text-center">Upload Documents</h2>
+                <hr>
+                <div class="row">
+                    <div class="col-md">
+                        <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                {% for document in documents %}
+                                <div class="carousel-item {% if forloop.first %} active {% endif %}">
+                                    <h3 class="text-center">
+                                        {{ document.requirement.text }}
+                                    </h3>
+                                    <img src="{{ document.image.url }}" class="d-block w-100" alt="...">
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <button class="carousel-control-prev" type="button"
+                                data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button"
+                                data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md">
+                        {% crispy document_form %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="referees">
+                <h2 class="text-center">Referee Information</h2>
+                <hr>
+                {% crispy referee_form %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card-footer">
+        <p class="card-text">Please complete your profile information</p>
+    </div>
+</div>
+
+<div id="message" class="position-fixed end-0 top-0 mt-5 me-2"></div>
+
+{% endblock %}
+
+{% block body_end %}
+{% include "../parts/htmx.html" %}
+{% endblock %}

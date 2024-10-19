@@ -1,0 +1,44 @@
+{% extends 'admin-base.html' %}
+
+{% block content %}
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h1>{{ header|default:'All applicants' }}</h1>
+    </div>
+
+    <div class="card-body">
+        <div class="accordion accordion-flush" id="applicants">
+            {% for applicant in applicants %}
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#applicant-{{ applicant.id }}" aria-expanded="false" aria-controls="flush-collapseOne">
+                        {{ applicant }}
+                    </button>
+                </h2>
+
+                <div id="applicant-{{ applicant.id }}" class="accordion-collapse collapse" data-bs-parent="#applicants">
+                    <div class="accordion-body">
+                        {% include "../parts/personal-info.html" with applicant=applicant %}
+    
+                        <div hx-target="this" hx-swap="outerHTML">
+                            {% include "../parts/applicant-access.html" with applicant=applicant %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card-footer">
+        {% include "../parts/paginator.html" with page_obj=applicants %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block body_end %}
+{% include "../parts/htmx.html" %}
+{% endblock %}

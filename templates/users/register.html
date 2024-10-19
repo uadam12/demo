@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title text-center text-secondary">Borno State Scholarship Board</h3>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {% load crispy_forms_tags %}
+    
+        <div class="card-body">
+            {% crispy form %}
+
+            <hr>
+            <div class="text-end">
+                <a href="{% url 'user:login' %}" class="btn btn-success">
+                    Login Instead
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    Create account
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock content %}

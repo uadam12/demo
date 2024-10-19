@@ -1,0 +1,58 @@
+<p>
+    <b>Firstname:</b>
+    {{ applicant.first_name }}
+</p>
+
+<p>
+    <b>Lastname:</b>
+    {{ applicant.last_name }}
+</p>
+
+<p>
+    <b>Email:</b>
+    <a href="mailto:{{ applicant.email }}">
+        {{ applicant.email }}
+    </a>
+</p>
+
+{% with info=applicant.personal_info %}
+<p>
+    <b>Guardian Fullname:</b>
+    {{ info.guardian_name }}
+</p>
+
+<p>
+    <b>Phone Number:</b>
+    {{ info.phone_number }}
+</p>
+
+<p>
+    <b>Date Of Birth:</b>
+    {{ info.date_of_birth }}
+</p>
+
+<p>
+    <b>Place Of Birth:</b>
+    {{ info.place_of_birth }}
+</p>
+
+<p>
+    <b>National Identification Number(NIN):</b>
+    {{ info.nin }}
+</p>
+
+<p>
+    <b>Bank Verification Number(BVN):</b>
+    {{ info.bvn }}
+</p>
+
+<p>
+    <b>Local Government Area(LGA):</b>
+    {{ info.lga }}
+</p>
+
+<p>
+    <b>Residential Address:</b>
+    {{ info.residential_address }}
+</p>
+{% endwith %}

@@ -1,0 +1,53 @@
+inst_types = {
+    "University": [
+        "University of Lagos",
+        "University of Ibadan",
+        "Ahmadu Bello University",
+        "Obafemi Awolowo University",
+        "Federal University of Technology, Akure",
+        "University of Maiduguri",
+        "Lagos State University",
+        "Benue State University",
+        "Rivers State University",
+        "Abia State University",
+    ],
+
+    "Polytecnique": [
+        "Delta State University",
+        "Borno State University",
+        "Covenant University",
+        "Babcock University",
+        "American University of Nigeria",
+        "Afe Babalola University",
+        "Yaba College of Technology",
+        "Federal Polytechnic, Nekede",
+        "Kaduna Polytechnic",
+        "Federal Polytechnic, Bauchi",
+        "Federal Polytechnic, Damaturu",
+        "The Polytechnic, Ibadan",
+        "Kano State Polytechnic",
+        "Lagos State Polytechnic",
+        "Delta State Polytechnic, Otefe-Oghara",
+    ],
+
+    "Colledge": [
+        "Ramat Polytechnic, Maiduguri",
+        "Covenant Polytechnic",
+        "Heritage Polytechnic",
+        "Grace Polytechnic",
+        "Rufus Giwa Polytechnic",
+        "Adeyemi College of Education",
+        "Federal College of Education, Zaria",
+        "Federal College of Education (Technical), Akoka",
+        "Federal College of Education, Kano",
+        "Federal College of Education, Yola",
+        "Kano State College of Education",
+        "Oyo State College of Education",
+        "Lagos State College of Education",
+        "Delta State College of Education",
+        "Alhikmah College of Education",
+        "Hill College of Education",
+        "St. Augustine College of Education",
+        "Muhyideen College of Education"
+    ]
+}

@@ -1,0 +1,40 @@
+<div class='card mb-2'>
+    <div class="row p-3 align-items-center">
+        <div class="col-md-4">
+            <img src="{{ user.picture.url }}" class="img d-block mx-auto" />
+        </div>
+
+        <div class="col-md-8">
+            <div class="d-md-none">
+                <hr>
+            </div>
+
+            <div class="text-center text-md-start">
+                <div class="btn-group mx-auto">
+                    <a href="#" class="btn btn-primary">
+                        <i class="fa fa-download"></i>
+                        Download Profile
+                    </a>
+    
+                    <a href="{% url 'user:change-picture' %}" class="btn btn-warning">
+                        <i class="fa fa-camera"></i>
+                        Change Pictue
+                    </a>
+    
+                    <a href="{% url 'user:update-name' %}" class="btn btn-danger">
+                        <i class="fa fa-pencil"></i>
+                        Update Name
+                    </a>
+                </div>
+
+                <h3 class="card-title">
+                    {{ user.first_name }} {{ user.last_name }}
+                </h3>
+
+                <p class="card-subtitle">
+                    {{ user.email }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,57 @@
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bssb-navbar"
+    aria-controls="bssb-navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+</button>
+
+<div class="collapse navbar-collapse" id="bssb-navbar">
+    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'main:news' %}">News</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'main:about' %}">About</a>
+        </li>
+
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'main:contact' %}">Contact</a>
+        </li>
+
+        <li class="nav-item dropstart">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <img src="/media/default-user.svg" alt="" width="30" height="30">
+            </a>
+
+            <ul class="dropdown-menu bg-reset" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="{% url 'applicant:profile' %}">Profile</a></li>
+                <li><a class="dropdown-item" href="{% url user.dashboard %}">Dashboard</a></li>
+                <li class="ps-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="dark-mode">
+                        <label class="form-check-label" for="dark-mode">Dark Mode</label>
+                    </div>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li>
+                    <form method="post" class="ps-3" action="{% url 'user:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </li>
+        {% else %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'user:login' %}">Login</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'user:register' %}">Register</a>
+        </li>
+        {% endif %}
+    </ul>
+</div>

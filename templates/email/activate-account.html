@@ -1,0 +1,9 @@
+{% autoescape off %}  
+
+Hi {{ user }},
+Please click on the link to confirm your registration with BSSB,
+http://{{ domain }}{% url 'user:activate' uidb64=uid token=token %}
+
+Best regards,
+Borno State Scholarship Board
+{% endautoescape %}  

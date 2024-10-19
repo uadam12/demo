@@ -1,0 +1,59 @@
+{% extends 'admin-base.html' %}
+
+{% block content %}
+    <h1 class="text-center text-primary">
+        {{ scholarship }}
+    </h1>
+
+    <h3>Criteria:</h3>
+    <ul>
+    {% for criterion in scholarship.criteria.all %}
+        <li>{{ criterion }}</li>
+    {% endfor %}
+    </ul>
+
+    <h3>Requiremets:</h3>
+    <ul>
+    {% for requirement in scholarship.requirements.all %}
+        <li>{{ requirement }}</li>
+    {% endfor %}
+    </ul>
+
+    <h3>Targeted Programs:</h3>
+    <ul>
+    {% for program in scholarship.programs.all %}
+        <li class="d-flex justify-content-between">
+            <p>{{ program }}</p>
+            <p class="me-3">
+                <a href="{% url 'scholarship:update-program' id=program.id %}" class="btn btn-warning">
+                    <i class="fa fa-pencil"></i>
+                </a>
+                <a href="{% url 'scholarship:delete-program' id=program.id %}" class="btn btn-danger">
+                    <i class="fa fa-trash"></i>
+                </a>
+            </p>
+        </li>
+    
+    {% empty %}
+        <li class="text-muted">Please add target program</li>
+    {% endfor %}
+    </ul>
+
+    <div class="btn-group">
+        <a href="{% url 'scholarship:update' id=scholarship.id %}" class="btn btn-outline-primary">
+            Update <i class="fa fa-pencil"></i>
+        </a>
+        <a href="{% url 'scholarship:add-program' id=scholarship.id %}" class="btn btn-outline-primary">
+            Program <i class="fa fa-plus"></i>
+        </a>
+
+        <a href="{% url 'scholarship:scholarship-applications' id=scholarship.id %}" class="btn btn-outline-primary">
+            Applications <i class="fa fa-file"></i>
+        </a>
+
+        <a href="#" class="btn btn-outline-primary">
+            Disbursement <i class="fa fa-money"></i>
+        </a>
+    </div>
+
+{% endblock %}

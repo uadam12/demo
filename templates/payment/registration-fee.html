@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="text-center text-primary">Registration FEE</h1>
+    <p>
+        Dear {{user}},<br> 
+        You need to pay non-refundable fee of #{{amount}} to continue.
+    </p>
+    <p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">
+                Pay Now
+            </button>
+        </form>
+    </p>
+{% endblock %}

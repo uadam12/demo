@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="text-center text-primary">
+    {{ scholarship }} application
+</h1>
+
+<p> {{ scholarship.description }}</p>
+
+<h5>You need to past the following criteria:</h5>
+<ul>
+{% for criterion in scholarship.criteria.all %}
+    <li>{{ criterion }}</li>
+{% endfor %}
+</ul>
+
+<h5>You will be ask to upload the following documents:</h5>
+<ul>
+{% for requirement in scholarship.requirements.all %}
+    <li>{{ requirement }}</li>
+{% endfor %}
+</ul>
+
+
+<h5>Finally, you must also pay non refundable of NGN{{ scholarship.application_fee }} as application FEE.</h5>
+
+<form method="post" class="text-center">
+    {% csrf_token %}
+    <button class="btn btn-success">Pay Application FEE Now</button>
+</form>
+{% endblock %}

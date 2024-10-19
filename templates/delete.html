@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title text-secondary text-center">
+            Delete {{ model }} confirmation
+        </h3>
+    </div>
+
+    <div class="card-body">
+        <p class="text-danger">
+            Are you sure you want to delete {{ obj }}. <br>
+            Note: This action permanent thereby cannot be reversed.
+        </p>
+    </div>
+
+    <form method="post" class="card-footer text-end">
+        {% csrf_token %}
+        <a href="{{ back_url }}" class="btn btn-success">
+            <i class="fa fa-arrow-left"></i> Cancel
+        </a>
+
+        <button class="btn btn-danger">
+            <i class="fa fa-trash"></i> Delete
+        </button>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+<tr>
+    <th>S/N</th>
+    <th>Label</th>
+    <th>Is Required?</th>
+    <th>Actions</th>
+</tr>
+
+{% for requirement in requirements %}
+<tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ requirement.requirement }}</td>
+    <td>
+        {% if requirement.is_required %} Yes - Required {% else %} No - Optional {% endif %}
+        
+    </td>
+    <td>
+        <a href="{% url 'board:update-registration-requirement' id=requirement.id %}" class="btn btn-warning">
+            <i class="fa fa-pencil"></i>
+        </a>
+
+        <a href="{% url 'board:delete-registration-requirement' id=requirement.id %}" class="btn btn-danger">
+            <i class="fa fa-trash"></i>
+        </a>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="4" class="text-center text-muted">
+        There is no available registration requirement
+    </td>
+</tr>
+{% endfor %}

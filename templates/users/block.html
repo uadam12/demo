@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="text-center text-secondary">Block Account</h1>
+    <p>
+        Sorry for the inconviniences you will feel, 
+        but your account is temporarily block due to 
+        some suspitious activies.
+    </p>
+
+    <p class="text-center">
+        <a href="{% url 'main:news' %}" class="btn btn-success">
+            Read News in the meantime
+        </a>
+    </p>
+{% endblock %}
