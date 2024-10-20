@@ -133,19 +133,6 @@ def lgas(request):
         title='BSSB | Local Govenment Areas',
         lgas = LGA.objects.all()
     )
-    
-def lga(request, id):
-    lga = get_object_or_404(LGA, id=id)
-    page = request.GET.get('page', 1)
-    paginator = Paginator([c.user for c in lga.candidates.all()], 10)
-    applicants = paginator.get_page(page)
-
-    return render(
-        request, "officials/applicants",
-        title='BSSB | Local Govenment Areas',
-        header = f"Applicants from {lga}",
-        applicants = applicants
-    )
 
 def create_lga(request):
     return create_view(

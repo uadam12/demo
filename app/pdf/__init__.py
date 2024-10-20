@@ -1,7 +1,6 @@
 import os
 from django.conf import settings
 from .helpers import PDFDoc, Header, Row, Text, Grid, Signature
-from .application import application
 
 
 def get_image(name):
@@ -14,13 +13,18 @@ def generate_application_form(application, request):
     #doc = PDFDoc(f"{application.application_id} Application Form.pdf")
     applicant = application.applicant
     info = applicant.personal_info
+    
+    try:
+        applicant_img = get_image(applicant.picture.name)
+    except:
+        applicant_img = get_image('applicant.jpg')
 
     doc = PDFDoc('demo.pdf')
     doc.add(Header(
         get_image('logo.png'), 
         str(application.scholarship),
         application.application_id,
-        get_image('applicant.jpg')
+        applicant_img
     ))
 
     # Personal Information

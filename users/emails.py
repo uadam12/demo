@@ -18,17 +18,18 @@ def activate_email(request, user, email):
         'domain': domain,
         'uid': uidb64,
         'token': token,
-        'protocol': 'https' if request.is_secure() else 'http'
+        'protocol': 'https'
+        #'protocol': 'https' if request.is_secure() else 'http'
     })
-    email = EmailMessage(mail_subject, message, to=[email])
+    email_msg = EmailMessage(mail_subject, message, to=[email])
     url = domain+reverse('user:activate', kwargs={
         'uidb64': uidb64, 
         'token': token
     })
     
-    #messages.error(request, url)
+    messages.error(request, url)
 
-    if email.send():
+    if email_msg.send():
         messages.success(request, f'Dear <b>{user}</b>, please go to you email <b>{email}</b> inbox and click on \
             received activation link to confirm and complete the registration. <b>Note:</b> Check your spam folder.')
     else:

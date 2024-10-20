@@ -18,6 +18,7 @@ def change_picture(request):
         request,
         instance=request.user,
         form_class=ProfilePictureForm,
+        form_kwargs={'files': request.FILES},
         success_url='applicant:profile',
         template='users/change-picture'
     )
@@ -40,14 +41,12 @@ def register(request):
 
         if form.is_valid():
             user = form.save(commit=False)
-            activate_email(request, user, form.cleaned_data.get('email'))
             user.is_active = False
             user.save()
             
-            #activate_email(request, user, form.cleaned_data.get('email'))
-
+            activate_email(request, user, user.email)
             messages.success(request, 'Account created successfully!')
-            messages.info(request, 'We have emailed to the instruction(s) to activate your account!')
+            messages.info(request, 'We have sent to you the instruction(s) to activate your account!')
 
             return redirect('user:inactive')
     
@@ -69,8 +68,8 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.save()
 
-        messages.success(request, 'Thank you for your email confirmation. Now you can login your account.')
-        return redirect('user:login')
+        messages.success(request, 'Thank you for your email confirmation. Now you can complete your profile information.')
+        return redirect('applicant:profile')
     else:
         messages.error(request, 'Activation link is invalid!')
     

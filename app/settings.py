@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crispy_forms', 'crispy_bootstrap5',
+    'django_filters', 'crispy_forms', 'crispy_bootstrap5',
     'board', 'main', 'users', 'academic',  
     'scholarship', 'applicant',
     'registration', 'payment'

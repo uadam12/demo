@@ -29,7 +29,7 @@ class ProfilePictureForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.helper = FormHelper()
-        self.helper.form_tag = False
+        self.helper.form_enctype = 'multipart/form-data'
         self.helper.layout = Layout(
             'picture',
             Div(

@@ -84,7 +84,7 @@ def account_details(request):
         
         if form.is_valid():
             account_bank = form.save(False)
-            account_bank.owner = request.user
+            account_bank.user = request.user
             account_bank.save()
             return render(request, 'parts/msg', message='Account details Save successfully.')
         return render(request, 'parts/msg', message=str(form.errors))
@@ -150,5 +150,5 @@ def apply(request, id):
         request, 'applicants/apply', 
         scholarship = scholarship,
         form = form,
-        title="Open Scholarships"
+        title=f"Application for {scholarship}"
     )

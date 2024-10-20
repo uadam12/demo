@@ -22,9 +22,6 @@
                 <td>{{ forloop.counter }}</td>
                 <td>{{ lga.name }}</td>
                 <td>
-                    <a href="{% url 'board:lga' id=lga.id %}" class="btn btn-primary">
-                        <i class="fa fa-eye"></i>
-                    </a>
                     <a href="{% url 'board:update-lga' id=lga.id %}" class="btn btn-warning">
                         <i class="fa fa-pencil"></i>
                     </a>

@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from app import render, is_post, get_or_none
 from app.views import create_view, delete_view
 from app.auth import officials_only
-#from scholarship.models import Scholarship, InternalScholarship
+from applicant.filters import ApplicantFilter
 from .official_forms import AdminForm, GuestForm
 from .models import User
 
@@ -81,13 +81,16 @@ def delete_guest(request, id):
 @officials_only()
 def applicants(request):
     page = request.GET.get('page', 1)
-    paginator = Paginator(User.applicants(), 10)
+    filtered_applicants = ApplicantFilter(request.GET, queryset=User.applicants())
+    paginator = Paginator(filtered_applicants.qs, 10)
     applicants = paginator.get_page(page)
+    
 
     return render(
         request, 'officials/applicants',
         title='BSSB | Applicants',
         applicants=applicants,
+        form = filtered_applicants.form
     )
 
 

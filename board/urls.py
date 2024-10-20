@@ -25,7 +25,6 @@ urlpatterns = [
     
     # Local Government Area(LGA)
     path('lgas/', views.lgas, name='lgas'),
-    path('lgas/<int:id>/', views.lga, name='lga'),
     path('lgas/create/', views.create_lga, name='create-lga'),
     path('lgas/<int:id>/update/', views.update_lga, name='update-lga'),
     path('lgas/<int:id>/delete/', views.delete_lga, name='delete-lga'),

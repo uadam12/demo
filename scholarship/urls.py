@@ -18,4 +18,9 @@ urlpatterns = [
     path('applications/', app_views.applications, name='applications'),
     path('applications/<int:id>', app_views.scholarship_applications, name='scholarship-applications'),
     path('applications/<str:application_id>', app_views.application, name='application'),
+    path('applications/<int:id>/approve', app_views.approve_application, name='approve-application'),
+    path('applications/<int:id>/reject', app_views.reject_application, name='reject-application'),
+
+    path('disbursements/<int:id>', app_views.scholarship_disbursements, name='scholarship-disbursement'),
+
 ]

@@ -1,0 +1,11 @@
+{% if application.status != 'approved' %}
+<button hx-post="{% url 'scholarship:approve-application' id=application.id %}" class="btn btn-success">
+    Approve Application
+</button>
+{% endif %}
+
+{% if application.status != 'rejected' %}
+<button hx-post="{% url 'scholarship:reject-application' id=application.id %}" class="btn btn-danger">
+    Reject Application
+</button>
+{% endif %}
