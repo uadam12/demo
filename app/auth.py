@@ -20,7 +20,7 @@ def logout_required(view):
     def wrapper(request, *args, **kwargs):
         if request.user.is_authenticated:
             messages.info(request, 'You are already authenticated.')
-            return redirect('user:dashboard')
+            return redirect(request.user.dashboard)
 
         return view(request, *args, **kwargs)
     return wrapper

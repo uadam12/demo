@@ -22,10 +22,6 @@
                 <td>{{ forloop.counter }}</td>
                 <td>{{ inst.name }}</td>
                 <td>
-                    <a href="{% url 'academic:institution' id=inst.id %}" class="btn btn-primary">
-                        <i class="fa fa-eye"></i>
-                    </a>
-                    
                     <a href="{% url 'academic:update-institution' id=inst.id %}" class="btn btn-warning">
                         <i class="fa fa-pencil"></i>
                     </a>

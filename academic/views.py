@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from app import render
 from app.views import update_view, delete_view, create_view
 from app.auth import officials_only
+from .filters import CourseFilter
 from .forms import (
     InstitutionType, InstitutionTypeForm,
     Institution, InstitutionForm,
@@ -191,10 +192,12 @@ def delete_course_type(request, id):
 # Courses
 @officials_only()
 def courses(request):
+    filter = CourseFilter(request.GET, queryset=Course.objects.all())
     return render(
         request, "academic/courses",
         title='BSSB | Courses',
-        courses = Course.objects.all(),
+        courses = filter.qs,
+        form = filter.form
     )
 
 @officials_only(admin_only=True)
