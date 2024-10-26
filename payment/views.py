@@ -2,13 +2,24 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.urls import reverse
 from app import render, is_post
-from app.auth import login_required, applicant_only
+from app.auth import login_required, applicant_only, officials_only
 from registration.models import Registration
 from scholarship.models import Scholarship
 from .models import Payment, ApplicationFEE
+from .filters import PaymentFilter
 from .payment import payment
 
 # Create your views here.
+@officials_only()
+def index(request):
+    filter = PaymentFilter(request.GET, queryset=Payment.objects.all())
+    
+    return render(
+        request, 'payment/index', 'BSSB Payment Details',
+        payments = filter.qs,
+        form = filter.form
+    )
+
 @login_required
 def registration_fee(request):
     amount = float(Registration.load().fee)
@@ -26,7 +37,7 @@ def registration_fee(request):
     )
 
 
-@applicant_only
+@login_required
 def verify_reg_fee_payment(request):
     rrr = request.GET.get('reference', None)
     
@@ -46,7 +57,7 @@ def verify_reg_fee_payment(request):
 
             messages.success(request, 'Registration FEE paid successfully!!!')
             messages.info(request, 'Please complete your profile information.')
-            return redirect('user:profile')
+            return redirect('applicant:profile')
 
     return render(request, 'payment/verify-payment', title='BSSB Verify Payment')
 

@@ -139,7 +139,7 @@ class PDFDoc(SimpleDocTemplate):
         fontName='Helvetica-Bold'
     )
 
-    def __init__(self, filename):
+    def __init__(self):
         self.bssb_buffer = BytesIO()
         
         super().__init__(

@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from app import render
 from app.views import update_view, delete_view, create_view
 from app.auth import officials_only
-from .filters import CourseFilter
+from .filters import CourseFilter, LevelFilter, InstitutionFilter
 from .forms import (
     InstitutionType, InstitutionTypeForm,
     Institution, InstitutionForm,
@@ -24,6 +24,10 @@ def institution_types(request):
 
 def institution_type(request):
     id = request.GET.get('institution_type')
+    
+    if not id:
+        return render(request, 'parts/options', data = Institution.objects.none(), empty_label=f'Select your institution type')
+    
     institution_type = get_object_or_404(InstitutionType, id=id)
     institutions = institution_type.institutions.all()
     
@@ -61,10 +65,12 @@ def delete_institution_type(request, id):
 # Institutions
 @officials_only()
 def institutions(request):
+    filter = InstitutionFilter(request.GET, queryset=Institution.objects.all())
     return render(
         request, "academic/institutions",
         title='BSSB | Institutions',
-        institutions = Institution.objects.all(),
+        institutions = filter.qs,
+        form = filter.form
     )
 
 @officials_only(admin_only=True)
@@ -109,6 +115,10 @@ def programs(request):
 
 def program(request):
     id = request.GET.get('program')
+
+    if not id:
+        return render(request, 'parts/options', data = Level.objects.none(), empty_label=f'Select your program')
+
     program = get_object_or_404(Program, id=id)
     levels = program.levels.all()
     
@@ -155,6 +165,10 @@ def course_types(request):
 
 def course_type(request):
     id = request.GET.get('course_type')
+    
+    if not id:
+        return render(request, 'parts/options', data = Course.objects.none(), empty_label=f'Select your course type')
+
     program = get_object_or_404(CourseType, id=id)
     courses = program.courses.all()
     
@@ -232,10 +246,12 @@ def delete_course(request, id):
 # Levels
 @officials_only()
 def levels(request):
+    filter = LevelFilter(request.GET, queryset=Level.objects.all())
     return render(
         request, "academic/levels",
         title='BSSB | Levels',
-        levels = Level.objects.all(),
+        levels = filter.qs,
+        form = filter.form
     )
 
 @officials_only(admin_only=True)

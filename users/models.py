@@ -42,15 +42,11 @@ class User(AbstractUser):
  
     @classmethod
     def applicants(cls):
-        return cls.objects.filter(access_code=1)
+        return cls.objects.filter(access_code=1) | cls.blocked_users()
     
     @classmethod
     def blocked_users(cls):
-        return cls.objects.filter(is_blocked=True)
-
-    @classmethod
-    def unblocked_users(cls):
-        return cls.objects.filter(is_blocked=False)
+        return cls.objects.filter(access_code=0)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

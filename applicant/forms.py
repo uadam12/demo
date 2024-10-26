@@ -2,8 +2,9 @@ from django import forms
 from django.urls import reverse
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Div, Submit, Field
-from registration.models import Registration, Document
 from app import get_or_none
+from registration.models import Registration, Document
+from academic.models import Institution, Level, Course
 from .models import PersonalInformation, AcademicInformation, AccountBank, Referee
 
 class DateInput(forms.DateInput):
@@ -70,10 +71,14 @@ class AcademicInformationForm(forms.ModelForm):
     
         self.fields['id_number'].widget.attrs['placeholder'] = 'Enter your ID number here...'
         self.fields['institution_type'].empty_label = 'Select institution type'
-        self.fields['institution'].empty_label = 'Select institution'
+        self.fields['institution'].empty_label = 'Please select institution type'
+        #self.fields['institution'].queryset = Institution.objects.none()
         self.fields['program'].empty_label = 'Select program'
         self.fields['course_type'].empty_label = 'Select course type'
-        self.fields['course_of_study'].empty_label = 'Select course of study'
+        self.fields['course_of_study'].empty_label = 'Please select course type'
+        #self.fields['course_of_study'].queryset = Course.objects.none()
+        self.fields['current_level'].empty_label = 'Please select program'
+        #self.fields['current_level'].queryset = Level.objects.none()
         
         self.helper = FormHelper()
         self.helper.attrs['hx-post'] = reverse('applicant:save-academic-info')

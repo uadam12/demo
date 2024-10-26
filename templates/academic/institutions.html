@@ -1,6 +1,8 @@
 {% extends 'admin-base.html' %}
 
 {% block content %}
+    {% include "../parts/filter-form.html" with filter_label="Filter Academic Institutions" %}
+
     <div class="d-flex justify-content-between align-items-center mt-5">
         <h1>{{ header|default:'Institutions' }}</h1>
 

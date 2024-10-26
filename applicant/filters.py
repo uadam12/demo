@@ -20,7 +20,7 @@ class ApplicantFilter(df.FilterSet):
     
     gender = df.ChoiceFilter(
         field_name = 'personal_info__gender',
-        label = 'Local Government Area',
+        label = 'Gender',
         empty_label = 'Select Gender',
         choices = (
             ('Male', 'Male'),

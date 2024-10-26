@@ -1,6 +1,6 @@
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from django.contrib import messages
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpResponse
 from app import render, is_post, get_or_none
 from app.auth import login_required, officials_only
 from app.pdf import generate_application_form
@@ -97,11 +97,12 @@ def reject_application(request, id):
 
 
 @login_required
-def application(request:HttpRequest, application_id):
+def application(_, application_id):
     application = get_object_or_404(Application, application_id=application_id)
-    application_form = generate_application_form(application, request)
+    application_form = generate_application_form(application)
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'inline; filename="some_file.pdf"'
+    filename = f"{application.application_id} Application Form.pdf"
+    response['Content-Disposition'] = f'inline; filename="{filename}"'
     response.write(application_form)
     
     return response

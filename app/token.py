@@ -1,10 +1,14 @@
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils import six
+from itsdangerous import URLSafeTimedSerializer
+from django.conf import settings
 
-class TokenGenerator(PasswordResetTokenGenerator):
-    def _make_hash_value(self, user: AbstractBaseUser, timestamp: int) -> str:
-        return (
-            six.text_type(user.pk) +
-            six.text_type(timestamp)
-        )
+serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
+
+def generate_token(email:str) -> str:
+    return serializer.dumps(email)
+
+def verify_token(token) -> str | None:
+    try:
+        email = serializer.loads(token)
+        return email
+    except Exception:
+        return None

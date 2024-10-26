@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from crispy_forms.layout import Layout, Row, Column, Div, Submit
@@ -16,6 +17,28 @@ class EmailForm(forms.Form):
             'email',
             Div(
                 Submit('reset', 'Reset'),
+                css_class='text-end'
+            )
+        )
+
+class ResetPasswordForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput, required=True)
+    confirm = forms.CharField(widget=forms.PasswordInput)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        self.fields['password'].widget.attrs['placeholder'] = 'Enter new and also strong password'
+        self.fields['confirm'].widget.attrs['placeholder'] = 'Confirm your password'
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Row(
+                Column('password', css_class='form-group col-md-6 mb-0'),
+                Column('confirm', css_class='form-group col-md-6 mb-0'),
+                css_class='form-row'
+            ),
+            Div(
+                Submit('reset', 'Reset your Password'),
                 css_class='text-end'
             )
         )

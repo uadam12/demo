@@ -9,22 +9,22 @@ def get_image(name):
         name
     )
 
-def generate_application_form(application, request):
-    #doc = PDFDoc(f"{application.application_id} Application Form.pdf")
+def generate_application_form(application):
+    #doc = PDFDoc()
     applicant = application.applicant
     info = applicant.personal_info
     
-    try:
-        applicant_img = get_image(applicant.picture.name)
-    except:
-        applicant_img = get_image('applicant.jpg')
+    
+    img:str = applicant.picture.name
+    if img.endswith('svg'):
+        img = 'no_image.png'
 
-    doc = PDFDoc('demo.pdf')
+    doc = PDFDoc()
     doc.add(Header(
         get_image('logo.png'), 
         str(application.scholarship),
         application.application_id,
-        applicant_img
+        get_image(img)
     ))
 
     # Personal Information

@@ -6,7 +6,7 @@ from . import render, is_post
 
 def create_view(request, form_class, success_url, form_kwargs={}, header='Recods',  template='create', *args, **kwargs):
     if is_post(request):
-        form = form_class(data=request.POST, **form_kwargs)
+        form = form_class(data=request.POST, files=request.FILES, **form_kwargs)
         
         if form.is_valid() and form.save():
             messages.success(request, f"{header} created successfully!")
@@ -23,7 +23,7 @@ def create_view(request, form_class, success_url, form_kwargs={}, header='Recods
 
 def update_view(request, instance, form_class, success_url, form_kwargs={}, header='Recods',  template='update', *args, **kwargs):
     if is_post(request):
-        form = form_class(instance=instance, data=request.POST, **form_kwargs)
+        form = form_class(instance=instance, data=request.POST, files=request.FILES, **form_kwargs)
         
         if form.is_valid() and form.save():
             messages.success(request, f"{header} updated successfully!")

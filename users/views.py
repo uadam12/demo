@@ -2,14 +2,12 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login as login_user, logout as logout_user, authenticate
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import force_str
 from app import render, is_post
 from app.views import update_view
-from app.auth import login_required, logout_required
-from .token import account_activation_token
-from .forms import RegisterForm, LoginForm, EmailForm, UserForm, ProfilePictureForm
-from .emails import activate_email
+from app.token import verify_token
+from app.auth import login_required, logout_required, blocked_required
+from .forms import RegisterForm, LoginForm, EmailForm, UserForm, ProfilePictureForm, ResetPasswordForm
+from .emails import send_activation_email, send_recovery_email
 
 # Create your views here.
 @login_required
@@ -18,7 +16,6 @@ def change_picture(request):
         request,
         instance=request.user,
         form_class=ProfilePictureForm,
-        form_kwargs={'files': request.FILES},
         success_url='applicant:profile',
         template='users/change-picture'
     )
@@ -28,8 +25,10 @@ def update_name(request):
     return update_view(
         request,
         instance=request.user,
+        success_url='applicant:profile',
         form_class=UserForm,
-        header='Update name'
+        header='Update name',
+        template='users/update-name'
     )
 
 @logout_required
@@ -41,38 +40,37 @@ def register(request):
 
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False
-            user.save()
             
-            activate_email(request, user, user.email)
-            messages.success(request, 'Account created successfully!')
-            messages.info(request, 'We have sent to you the instruction(s) to activate your account!')
+            sent = send_activation_email(request, user)
+            
+            if sent:
+                user.is_active = False
+                user.save()
+                login_user(request, user)
+                messages.success(request, 'Account created successfully!')
+                return redirect('user:inactive')
 
-            return redirect('user:inactive')
-    
     return render(
         request, 'users/register',
         title = 'BSSB Registration',
         form = form
     )
 
-def activate(request, uidb64, token):
+def activate(request, token):
     User = get_user_model()
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
-
-    if user is not None and account_activation_token.check_token(user, token):
+    email = verify_token(token)
+    print(email)
+    user = User.objects.filter(email=email)
+    
+    if user.exists():
+        user = user.first()
         user.is_active = True
         user.save()
 
         messages.success(request, 'Thank you for your email confirmation. Now you can complete your profile information.')
         return redirect('applicant:profile')
-    else:
-        messages.error(request, 'Activation link is invalid!')
     
+    messages.error(request, 'Activation link is invalid!')
     return redirect('user:inactive')
 
 
@@ -123,9 +121,45 @@ def forgot_password(request):
         form = EmailForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
-            messages.success(request, email)
+            user = get_user_model().objects.filter(email=email)
+
+            if user.exists():
+                user = user.first()
+                
+                sent = send_recovery_email(request, user)
+                if sent:
+                    messages.success(request, 'Account recovery instruction(s) sent successfully.')
             
     return render(request, 'users/forgot-password', title='BSSB Forgot password', form=form)
 
+@logout_required
+def reset_password(request, token):
+    email = verify_token(token)
+    
+    if not email:
+        return redirect('user:login')
+
+    user = get_user_model().objects.filter(email=email)
+    if not user.exists():
+        messages.error(request, 'No account is associated with this email address')
+        return redirect('user:login')
+
+    form = ResetPasswordForm()
+    
+    if is_post(request):
+        form = ResetPasswordForm(request.POST)
+        
+        if form.is_valid():
+            password = form.cleaned_data['password']
+            user = user.first()
+            user.set_password(password)
+            user.save()
+            messages.success(request, 'Password updated successfully. Try your new password.')
+            return redirect('user:login')
+
+
+    return render(request, 'users/reset-password', 'BSSB | Reset Password', form=form)
+
+@blocked_required    
 def block(request):
     return render(request, 'users/block', 'BSSB | Block account')

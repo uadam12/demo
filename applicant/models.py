@@ -42,19 +42,6 @@ class AcademicInformation(models.Model):
     id_number = models.CharField(max_length=20)
     current_level = models.ForeignKey(Level, on_delete=models.CASCADE, related_name='academic_info')
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='academic_info')
-    
-    def clean(self) -> None:
-        if self.institution.institution_type != self.institution_type:
-            raise ValidationError({
-                'institution': "Institution doesn't belong to the selected institution type"
-            })
-            
-        if self.course_of_study.course_type != self.course_type:
-            raise ValidationError({
-                'course_of_study': "Course Of Study doesn't belong to the selected course type"
-            })
-
-        return super().clean()
 
     class Meta:
         ordering = ('id_number', )

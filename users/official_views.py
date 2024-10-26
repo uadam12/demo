@@ -5,6 +5,7 @@ from app import render, is_post, get_or_none
 from app.views import create_view, delete_view
 from app.auth import officials_only
 from applicant.filters import ApplicantFilter
+from scholarship.models import Scholarship
 from .official_forms import AdminForm, GuestForm
 from .models import User
 
@@ -14,8 +15,9 @@ def dashboard(request):
     return render(
         request, 'officials/dashboard', 
         title='BSSB Official Dashboard',
-        total_unblocked_users = User.unblocked_users().count(),
         total_blocked_users = User.blocked_users().count(),
+        total_open_scholarships = Scholarship.open_scholarships().count(),
+        total_scholarships = Scholarship.objects.count(),
         total_applicants = User.applicants().count(),
         total_users = User.objects.count(),
         total_admins = User.admins().count(),

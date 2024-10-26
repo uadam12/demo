@@ -10,12 +10,14 @@ class ArticleForm(forms.ModelForm):
         self.fields['content'].widget.attrs['placeholder'] = 'Enter article content here...'
         
         self.helper = FormHelper()
+        self.helper.form_enctype = 'multipart/form-data'
         self.helper.layout = Layout(
             Row(
                 Column('headline', css_class='form-group col-md-6 mb-0'),
-                Column('content', css_class='form-group col-md-6 mb-0'),
+                Column('headline_image', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
             ),
+            'content',
             Div(
                 Submit('save', 'Save Article'), 
                 css_class='text-end'
@@ -24,7 +26,7 @@ class ArticleForm(forms.ModelForm):
         
     class Meta:
         model = Article
-        fields = ("headline", "content",)
+        fields = ("headline", "headline_image", "content",)
 
 class ContactForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

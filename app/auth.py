@@ -30,7 +30,16 @@ def inactive_required(view):
     def wrapper(request, *args, **kwargs):
         if request.user.is_active:
             messages.info(request, 'Your account is already activated.')
-            return redirect('user:activation')
+            return redirect(request.user.dashboard)
+        
+        return view(request, *args, **kwargs)
+    return wrapper
+
+def blocked_required(view):
+    @login_required
+    def wrapper(request, *args, **kwargs):
+        if request.user.access_code > 0:
+            return redirect(request.user.dashboard)
         
         return view(request, *args, **kwargs)
     return wrapper
@@ -47,7 +56,7 @@ def applicant_only(view):
             messages.info(request, 'This page is for applicant only.')
             return redirect('official:dashboard')
         
-        if  request.user.paid_registration_fee:
+        if not request.user.paid_registration_fee:
             messages.info(request, 'You need to pay registration fee')
             return redirect('payment:registration-fee')
 

@@ -1,36 +1,76 @@
 from django.urls import reverse
 from django.contrib import messages
 from django.template.loader import render_to_string
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
-from django.core.mail import EmailMessage
-from .token import account_activation_token
+from django.core.mail import send_mail
+from django.utils.html import strip_tags
+from django.conf import settings
+from app.token import generate_token
 
-def activate_email(request, user, email):
-    mail_subject = 'Activate your user account.'
-    domain = get_current_site(request).domain
-    uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
-    token = account_activation_token.make_token(user)
-    
-    message = render_to_string('email/activate-account.html', {
-        'user': user,
-        'domain': domain,
-        'uid': uidb64,
-        'token': token,
-        'protocol': 'https'
-        #'protocol': 'https' if request.is_secure() else 'http'
-    })
-    email_msg = EmailMessage(mail_subject, message, to=[email])
-    url = domain+reverse('user:activate', kwargs={
-        'uidb64': uidb64, 
+
+def bssb_send_email(subject, message, recipient_list) -> bool:
+    plain_message = strip_tags(message)
+    return send_mail(
+        subject, plain_message,
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=recipient_list,
+        html_message=message,
+        fail_silently=True
+    )
+
+
+def send_activation_email(request, user) -> bool:
+    mail_subject = 'Activate Your Account'
+    token = generate_token(user.email)
+    activation_link = reverse('user:activate', kwargs={
         'token': token
     })
-    
-    messages.error(request, url)
+    activation_link = request.build_absolute_uri(activation_link)
+    message = render_to_string('email/activate-account.html', {
+        'user': user,
+        'activation_link': activation_link 
+    })
+    email_sent = bssb_send_email(mail_subject, message, [user.email])
 
-    if email_msg.send():
-        messages.success(request, f'Dear <b>{user}</b>, please go to you email <b>{email}</b> inbox and click on \
-            received activation link to confirm and complete the registration. <b>Note:</b> Check your spam folder.')
-    else:
-        messages.error(request, f'Problem sending confirmation email to {email}, check if you typed it correctly.')
+    if email_sent: 
+        messages.info(request, activation_link)
+        messages.success(
+            request, 
+            f"Dear {user}, please go to your email address to activate your account."
+        )
+        return True
+    
+    messages.error(
+        request, 
+        f'Problem sending activation email to {user.email}, check if you typed it correctly.'
+    )
+
+    return False
+
+def send_recovery_email(request, user) -> bool:
+    mail_subject = 'Recover Your Account'
+    token = generate_token(user.email)
+    recovery_link = reverse('user:reset-password', kwargs={
+        'token': token
+    })
+    recovery_link = request.build_absolute_uri(recovery_link)
+    message = render_to_string('email/recover-account.html', {
+        'user': user,
+        'recovery_link': recovery_link 
+    })
+    
+    email_sent = bssb_send_email(mail_subject, message, [user.email])
+    
+    if email_sent: 
+        messages.info(request, recovery_link)
+        messages.success(
+            request, 
+            f"Dear {user}, please go to your email address to recover your account."
+        )
+        return True
+    
+    messages.error(
+        request, 
+        f'Problem sending recovery email to {user.email}, check if account really exists.'
+    )
+
+    return False
