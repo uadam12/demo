@@ -42,8 +42,9 @@ class Bank(models.Model):
 
 
 class LGA(models.Model):
+    code = models.CharField(max_length=5, null=True, blank=True)
     name = models.CharField(max_length=70, unique=True)
-    
+
     def __str__(self) -> str:
         return self.name
     
