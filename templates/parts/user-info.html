@@ -1,0 +1,84 @@
+<div class="d-md-flex mb-2">
+    <div class='card text-center'>
+        <div class="card-header">
+            <h3 class="card-title">
+                {{ user.first_name }} {{ user.last_name }}
+            </h3>
+        </div>
+
+        <div class="card-body">
+            <img class="img-fluid rounded" src="{{ user.picture.url }}" />
+            <p>
+                {{ user.personal_info.gender }} - {{ user.personal_info.date_of_birth }}
+            </p>
+        </div>
+
+        <div class="card-footer">
+            <label for="profile-img-input" class="btn btn-primary">
+                <i class="fa fa-camera"></i> Update your picture
+            </label>
+            <input class="d-none" type="file" accept="png jpg" id="profile-img-input">
+        </div>
+    </div>
+
+    <div class="flex-grow-1 ms-md-2 card">
+        <div class="card-header">
+            <h3 class="card-title">Basic Information</h3>
+        </div>
+
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <b>Email Address</b>
+                        <span>{{ user.email }}</span>
+                    </div>
+                </li>
+    
+                {% with info=user.personal_info %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <b>Phone number</b>
+                        <span>{{ info.phone_number }}</span>
+                    </div>
+                </li>
+
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <b>Date Of Birth</b>
+                        <span>{{ info.date_of_birth }}</span>
+                    </div>
+                </li>
+    
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <b>Local Government Area(LGA)</b>
+                        <span>{{ info.local_government_area }}</span>
+                    </div>
+                </li>
+    
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <b>Gender</b>
+                        <span>{{ info.gender }}</span>
+                    </div>
+                </li>
+    
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <b>National Identificstion Number(NIN)</b>
+                        <span>{{ info.nin }}</span>
+                    </div>
+                </li>
+    
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <b>Bank Verification Number(BVN)</b>
+                        <span>{{ info.bvn }}</span>
+                    </div>
+                </li>
+                {% endwith %}
+            </ul>
+        </div>
+    </div>
+</div>

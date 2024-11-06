@@ -53,7 +53,14 @@ class AccountBank(models.Model):
     ])
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, related_name='account_banks')
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='account_bank')
-    
+
+class SchoolAttended(models.Model):
+    school_name = models.CharField(max_length=50)
+    certificate_obtained = models.CharField(max_length=80)
+    year_from = models.PositiveSmallIntegerField(default=2020)
+    year_to = models.PositiveSmallIntegerField(default=2024)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='schools_attended')
+
 class Referee(models.Model):
     fullname = models.CharField(max_length=50)
     occupation = models.CharField(max_length=30)

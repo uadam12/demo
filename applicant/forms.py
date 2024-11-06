@@ -4,8 +4,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Div, Submit, Field
 from app import get_or_none
 from registration.models import Registration, Document
-from academic.models import Institution, Level, Course
-from .models import PersonalInformation, AcademicInformation, AccountBank, Referee
+from .models import PersonalInformation, AcademicInformation, AccountBank, SchoolAttended, Referee
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -14,49 +13,32 @@ class DateInput(forms.DateInput):
 class PersonalInformationForm(forms.ModelForm):
     class Meta:
         model = PersonalInformation
-        exclude = ('user', )
+        fields = ('phone_number', 'place_of_birth', 'guardian_name', 'residential_address')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        self.fields['guardian_name'].widget.attrs['placeholder'] = 'Enter guardian name here...'
-        self.fields['phone_number'].widget.attrs['placeholder'] = 'Enter phone number here...'
-        self.fields['date_of_birth'].widget = DateInput(attrs={
-            'required': True,
-            'title': 'Select your date of birth'
-        })
-        self.fields['place_of_birth'].widget.attrs['placeholder'] = 'Enter place of birth here...'
-        self.fields['bvn'].widget.attrs['placeholder'] = 'Enter bank varification number here...'
-        self.fields['nin'].widget.attrs['placeholder'] = 'Enter national identification number here...'
-        self.fields['local_government_area'].empty_label = 'Select Local Government Area'
-        self.fields['residential_address'].widget.attrs['placeholder'] = 'Enter contact address here...'
+        self.fields['guardian_name'].widget.attrs['placeholder'] = 'Enter your guardian name'
+        self.fields['phone_number'].widget.attrs['placeholder'] = 'Enter your phone number'
+        self.fields['place_of_birth'].widget.attrs['placeholder'] = 'Enter your place of birth'
+        self.fields['residential_address'].widget.attrs['placeholder'] = 'Enter your residential address'
 
         self.helper = FormHelper()
-        self.helper.form_tag = False
+        self.helper.attrs['hx-post'] = reverse('applicant:save-personal-info')
         self.helper.layout = Layout(
             Row(
-                Column('gender', css_class='form-group col-md-4 mb-0'),
-                Column('guardian_name', css_class='form-group col-md-4 mb-0'),
-                Column('phone_number', css_class='form-group col-md-4 mb-0'),
-                css_class='form-row'
-            ),
-            
-            Row(
-                Column('date_of_birth', css_class='form-group col-md-6 mb-0'),
+                Column('phone_number', css_class='form-group col-md-6 mb-0'),
                 Column('place_of_birth', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
             ),
-            
             Row(
-                Column('bvn', css_class='form-group col-md-6 mb-0'),
-                Column('nin', css_class='form-group col-md-6 mb-0'),
+                Column('guardian_name', css_class='form-group col-md-5 mb-0'),
+                Column('residential_address', css_class='form-group col-md-7 mb-0'),
                 css_class='form-row'
             ),
-            
-            Row(
-                Column('local_government_area', css_class='form-group col-md-6 mb-0'),
-                Column('residential_address', css_class='form-group col-md-6 mb-0'),
-                css_class='form-row'
+            Div(
+                Submit('save', 'Save Personal Information'),
+                css_class='text-end'
             )
         )
 
@@ -159,6 +141,39 @@ class AccountBankForm(forms.ModelForm):
             )
         )
 
+class SchoolAttendedForm(forms.ModelForm):
+    
+    class Meta:
+        model = SchoolAttended
+        exclude = ("user",)
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    
+        self.fields['school_name'].widget.attrs['placeholder'] = 'Enter school attended name'
+        self.fields['certificate_obtained'].widget.attrs['placeholder'] = 'Enter certificate obtained from the school'
+        self.fields['year_from'].widget.attrs['placeholder'] = 'Enter year you started the school'
+        self.fields['year_to'].widget.attrs['placeholder'] = 'Enter year you finished the school'
+        
+        self.helper = FormHelper()
+        self.helper.attrs['hx-post'] = reverse('applicant:save-referee')
+        self.helper.layout = Layout(
+            Row(
+                Column('school_name', css_class='form-group col-md-6 mb-0'),
+                Column('certificate_obtained', css_class='form-group col-md-6 mb-0'),
+                css_class='form-row'
+            ),
+            Row(
+                Column('year_from', css_class='form-group col-md-6 mb-0'),
+                Column('year_to', css_class='form-group col-md-6 mb-0'),
+                css_class='form-row'
+            ),
+            Div(
+                Submit('save', 'Save School'),
+                css_class='text-end'
+            )
+        )
+
 class RefereeForm(forms.ModelForm):
     
     class Meta:
@@ -168,9 +183,9 @@ class RefereeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
-        self.fields['fullname'].widget.attrs['placeholder'] = 'Enter referees fullname here...'
-        self.fields['occupation'].widget.attrs['placeholder'] = 'Enter occupation here...'
-        self.fields['phone_number'].widget.attrs['placeholder'] = 'Enter referees fullname here...'
+        self.fields['fullname'].widget.attrs['placeholder'] = 'Enter referees fullname'
+        self.fields['occupation'].widget.attrs['placeholder'] = 'Enter referee occupation'
+        self.fields['phone_number'].widget.attrs['placeholder'] = 'Enter referees phone number'
         
         self.helper = FormHelper()
         self.helper.attrs['hx-post'] = reverse('applicant:save-referee')

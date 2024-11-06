@@ -1,7 +1,7 @@
 from django.shortcuts import  get_object_or_404, redirect
 from django.contrib import messages
 from applicant.models import Referee
-from users.forms import UserForm
+#from users.forms import UserForm
 from app import is_post, get_or_none, render
 from app.auth import applicant_only
 from scholarship.models import Scholarship
@@ -11,6 +11,7 @@ from .forms import (
     PersonalInformationForm, PersonalInformation,
     AcademicInformationForm, AcademicInformation,
     AccountBankForm, AccountBank, RefereeForm,
+    SchoolAttendedForm, SchoolAttended,
     DocumentForm, Document
 )
 
@@ -33,11 +34,11 @@ def profile(request):
     return render(
         request, 'applicants/profile', 
         title='BSSB Applicant Profile',
-        user_form = UserForm(instance=request.user),
         applicant_form = PersonalInformationForm(instance=applicant),
         academic_form = AcademicInformationForm(instance=academic_info),
         bank_form = AccountBankForm(instance=account_bank),
         referee_form = RefereeForm(instance=referee),
+        school_form = SchoolAttendedForm(),
         document_form = DocumentForm(user=user),
         documents = documents
     )
@@ -45,18 +46,16 @@ def profile(request):
 @applicant_only
 def personal_information(request):
     if is_post(request):
-        user_form = UserForm(instance=request.user, data=request.POST)
         personal_info = get_or_none(PersonalInformation, user=request.user)
-        personal_info_form = PersonalInformationForm(request.POST, instance=personal_info)
+        form = PersonalInformationForm(request.POST, instance=personal_info)
 
-        if user_form.is_valid() and personal_info_form.is_valid():
-            user_form.save()
-            personal_info = personal_info_form.save(False)
+        if form.is_valid():
+            personal_info = form.save(False)
             personal_info.user = request.user
             personal_info.save()
 
             return render(request, 'parts/msg', message='Personal Information Save successfully.')
-        return render(request, 'parts/msg', message=str(personal_info_form.errors) + str(user_form.errors))
+        return render(request, 'parts/msg', message=str(form.errors))
     
     return render(request, 'parts/msg', message="Invalid Request")
 
