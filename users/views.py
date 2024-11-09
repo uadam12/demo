@@ -39,8 +39,8 @@ def register(request):
         form = RegisterForm(request.POST)
 
         if form.is_valid():
+            """
             user = form.save(commit=False)
-            
             sent = send_activation_email(request, user)
             
             if sent:
@@ -49,6 +49,7 @@ def register(request):
                 login_user(request, user)
                 messages.success(request, 'Account created successfully!')
                 return redirect('user:inactive')
+            """
 
     return render(
         request, 'users/register',
