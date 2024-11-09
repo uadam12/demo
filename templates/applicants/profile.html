@@ -3,94 +3,172 @@
 
 {% block content %} {% load crispy_forms_tags %}
 <h1 class="text-center">Profile Details</h1>
-{% include "../parts/user-info.html" %}
 
-<div class='card mb-2'>
-    <div class="card-header">
-        <!-- Nav tabs -->
-        {% include "layouts/user-tabs.html" %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            {% include "../parts/user-info.html" %}
+        </div>
     </div>
-
-    <div class="card-body">
-        <div class='tab-content' hx-target="#message">
-            <!-- Tab panes -->
-            <div class="tab-pane active" id="personal">
-                <h2 class="text-center">Personal information</h2>
-                <hr>
-                {% crispy applicant_form %}
+    <div class="col-md-8">
+        <div class='card mb-2'>
+            <div class="card-header">
+                <!-- Nav tabs -->
+                {% include "layouts/user-tabs.html" %}
             </div>
-
-            <div class="tab-pane fade" id="academic">
-                <h2 class="text-center">Academic information</h2>
-                <hr>
-                {% crispy academic_form %}
-            </div>
-
-            <div class="tab-pane fade" id="account">
-                <h2 class="text-center">Bank Account Details</h2>
-                <hr>
-                {% crispy bank_form %}
-            </div>
-
-            <div class="tab-pane fade" id="schools">
-                <h2 class="text-center">Schools Attended</h2>
-                <hr>
-                {% crispy school_form %}
-            </div>
-
-            <div class="tab-pane fade" id="documents">
-                <h2 class="text-center">Upload Documents</h2>
-                <hr>
-                <div class="row">
-                    <div class="col-md">
-                        <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
-                            <div class="carousel-inner">
-                                {% for document in documents %}
-                                <div class="carousel-item {% if forloop.first %} active {% endif %}">
-                                    <h3 class="text-center">
-                                        {{ document.requirement.text }}
-                                    </h3>
-                                    <img src="{{ document.image.url }}" class="d-block w-100" alt="...">
-                                </div>
-                                {% endfor %}
-                            </div>
-                            <button class="carousel-control-prev" type="button"
-                                data-bs-target="#carouselExampleControls" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button"
-                                data-bs-target="#carouselExampleControls" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
-                        </div>
-
+        
+            <div class="card-body">
+                <div class='tab-content' hx-target="#message">
+                    <!-- Tab panes -->
+                    <div class="tab-pane active" id="personal">
+                        <h2 class="text-center">Personal information</h2>
+                        <hr>
+                        {% crispy applicant_form %}
                     </div>
-
-                    <div class="col-md">
-                        {% crispy document_form %}
+        
+                    <div class="tab-pane fade" id="academic">
+                        <h2 class="text-center">Academic information</h2>
+                        <hr>
+                        {% crispy academic_form %}
+                    </div>
+        
+                    <div class="tab-pane fade" id="account">
+                        <h2 class="text-center">Bank Account Details</h2>
+                        <hr>
+                        {% crispy bank_form %}
+                    </div>
+        
+                    <div class="tab-pane fade" id="schools">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="text-center">Schools Attended</h2>
+        
+                            <button hx-get="{% url 'applicant:add-school' %}" hx-target="#dialog" class="btn btn-primary">
+                                Add a School
+                              </button>
+                        </div>
+        
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover table-striped">
+                                <tr>
+                                    <th>School Name</th>
+                                    <th>Certificate Obtained</th>
+                                    <th>Year Started</th>
+                                    <th>Year Finish</th>
+                                    <th>Actions</th>
+                                </tr>
+        
+                                <tbody hx-trigger="load, schoolListChanged from:body" hx-get="{% url 'applicant:schools-attended' %}" hx-target="this">
+                                    {% include "../parts/schools-attended.html" %}
+                                  </tbody>
+                            </table>
+                        </div>
+                    </div>
+        
+                    <div class="tab-pane fade" id="documents">
+                        <h2 class="text-center">Upload Documents</h2>
+                        <hr>
+                        <div class="row">
+                            {% if documents %}
+                            <div class="col-md">
+                                <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner">
+                                        {% for document in documents %}
+                                        <div class="carousel-item {% if forloop.first %} active {% endif %}">
+                                            <img src="{{ document.image.url }}" class="d-block w-100" alt="{{ document.requirement.text }}">
+                                            <div class="carousel-caption d-none d-md-block">
+                                                <h5>{{ document.requirement.text }}</h5>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <button class="carousel-control-prev" type="button"
+                                        data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button"
+                                        data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+        
+                            <div class="col-md">
+                                {% crispy document_form %}
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="tab-pane fade" id="referees">
+                        <h2 class="text-center">Referee Information</h2>
+                        <hr>
+                        {% crispy referee_form %}
                     </div>
                 </div>
             </div>
-
-            <div class="tab-pane fade" id="referees">
-                <h2 class="text-center">Referee Information</h2>
-                <hr>
-                {% crispy referee_form %}
-            </div>
         </div>
     </div>
-
-    <div class="card-footer">
-        <p class="card-text">Please complete your profile information</p>
-    </div>
 </div>
-
-<div id="message" class="position-fixed end-0 top-0 mt-5 me-2"></div>
-
 {% endblock %}
 
 {% block body_end %}
 {% include "../parts/htmx.html" %}
+
+<!-- Placeholder for the modal -->
+<div id="modal" class="modal fade">
+    <div id="dialog" class="modal-dialog" hx-target="this"></div>
+</div>
+
+<!-- Empty toast to show the message -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive"
+        aria-atomic="true">
+        <div class="d-flex">
+            <div id="toast-body" class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const modal = new bootstrap.Modal(document.getElementById("modal"))
+
+        htmx.on("htmx:afterSwap", (e) => {
+            // Response targeting #dialog => show the modal
+            if (e.detail.target.id == "dialog") {
+                modal.show()
+            }
+        })
+
+        htmx.on("htmx:beforeSwap", (e) => {
+            // Empty response targeting #dialog => hide the modal
+            if (e.detail.target.id == "dialog" && !e.detail.xhr.response) {
+                modal.hide()
+                e.detail.shouldSwap = false
+            }
+        })
+
+        // Remove dialog content after hiding
+        htmx.on("hidden.bs.modal", () => {
+            document.getElementById("dialog").innerHTML = ""
+        })
+    })();
+
+    (function () {
+        const toastElement = document.getElementById("toast")
+        const toastBody = document.getElementById("toast-body")
+        const toast = new bootstrap.Toast(toastElement, { delay: 2000 })
+
+        htmx.on("showMessage", (e) => {
+            toastBody.innerText = e.detail.value
+            toast.show()
+        })
+    })();
+</script>
 {% endblock %}

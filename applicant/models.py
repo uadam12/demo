@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from app.validators import validate_phone_number
 from users.models import User
@@ -15,6 +14,7 @@ class PersonalInformation(models.Model):
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='personal_info')
     guardian_name = models.CharField(max_length=50)
+    guardian_phone_number = models.CharField(max_length=15, default='080XXXXXXXX', validators=[validate_phone_number])
     phone_number = models.CharField(max_length=15, unique=True, validators=[validate_phone_number])
     gender = models.CharField(max_length=10, choices=GENDER)
     date_of_birth = models.DateField()
@@ -30,6 +30,9 @@ class PersonalInformation(models.Model):
     
     class Meta:
         ordering = ('date_of_birth', )
+        
+    def __str__(self):
+        return f"Personal Informtion of {self.user}"
 
 class AcademicInformation(models.Model):
     institution_type = models.ForeignKey(InstitutionType, on_delete=models.CASCADE, related_name='academic_info')
@@ -46,6 +49,10 @@ class AcademicInformation(models.Model):
     class Meta:
         ordering = ('id_number', )
 
+    
+    def __str__(self):
+        return f"Academic Informtion of {self.user}"
+    
 class AccountBank(models.Model):
     account_name = models.CharField(max_length=80)
     account_number = models.CharField(max_length=10, unique=True, validators=[
@@ -54,15 +61,33 @@ class AccountBank(models.Model):
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, related_name='account_banks')
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='account_bank')
 
+    def __str__(self):
+        return f"Bank Account details of {self.user}"
+
 class SchoolAttended(models.Model):
     school_name = models.CharField(max_length=50)
     certificate_obtained = models.CharField(max_length=80)
     year_from = models.PositiveSmallIntegerField(default=2020)
     year_to = models.PositiveSmallIntegerField(default=2024)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='schools_attended')
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'school_name'], 
+                name='unique_name_per_applicant', 
+                violation_error_message='You have already added this school.'
+            )
+        ]
+    
+    def __str__(self):
+        return f"{self.school_name} | {self.year_from} - {self.year_to}"
 
 class Referee(models.Model):
     fullname = models.CharField(max_length=50)
     occupation = models.CharField(max_length=30)
     phone_number = models.CharField(max_length=15, validators=[validate_phone_number])
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='referee')
+
+    def __str__(self):
+        return f"{self.fullname} | Referee of {self.user}"

@@ -1,0 +1,17 @@
+{% for school in schools %}
+<tr>
+    <td>{{ school.school_name }}</td>
+    <td>{{ school.certificate_obtained }}</td>
+    <td>{{ school.year_from }}</td>
+    <td>{{ school.year_to }}</td>
+    
+    <td>
+        <button class="btn btn-warning" hx-get="{% url 'applicant:update-school' pk=school.pk %}" hx-target="#dialog">
+            <i class="fa fa-pencil"></i>
+        </button>
+        <button class="btn btn-danger" hx-get="{% url 'applicant:delete-school' pk=school.pk %}" hx-target="#dialog">
+            <i class="fa fa-trash"></i>
+        </button>
+    </td>
+</tr>
+{% endfor %}

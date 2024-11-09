@@ -13,18 +13,20 @@ class DateInput(forms.DateInput):
 class PersonalInformationForm(forms.ModelForm):
     class Meta:
         model = PersonalInformation
-        fields = ('phone_number', 'place_of_birth', 'guardian_name', 'residential_address')
+        fields = ('phone_number', 'place_of_birth', 'guardian_name', 'guardian_phone_number', 'residential_address')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
         self.fields['guardian_name'].widget.attrs['placeholder'] = 'Enter your guardian name'
+        self.fields['guardian_phone_number'].widget.attrs['placeholder'] = 'Enter your guardian phone number'
         self.fields['phone_number'].widget.attrs['placeholder'] = 'Enter your phone number'
         self.fields['place_of_birth'].widget.attrs['placeholder'] = 'Enter your place of birth'
         self.fields['residential_address'].widget.attrs['placeholder'] = 'Enter your residential address'
 
         self.helper = FormHelper()
         self.helper.attrs['hx-post'] = reverse('applicant:save-personal-info')
+        self.helper.attrs['hx-target'] = 'this'
         self.helper.layout = Layout(
             Row(
                 Column('phone_number', css_class='form-group col-md-6 mb-0'),
@@ -33,9 +35,10 @@ class PersonalInformationForm(forms.ModelForm):
             ),
             Row(
                 Column('guardian_name', css_class='form-group col-md-5 mb-0'),
-                Column('residential_address', css_class='form-group col-md-7 mb-0'),
+                Column('guardian_phone_number', css_class='form-group col-md-7 mb-0'),
                 css_class='form-row'
             ),
+            'residential_address',
             Div(
                 Submit('save', 'Save Personal Information'),
                 css_class='text-end'
@@ -54,17 +57,14 @@ class AcademicInformationForm(forms.ModelForm):
         self.fields['id_number'].widget.attrs['placeholder'] = 'Enter your ID number here...'
         self.fields['institution_type'].empty_label = 'Select institution type'
         self.fields['institution'].empty_label = 'Please select institution type'
-        #self.fields['institution'].queryset = Institution.objects.none()
         self.fields['program'].empty_label = 'Select program'
         self.fields['course_type'].empty_label = 'Select course type'
         self.fields['course_of_study'].empty_label = 'Please select course type'
-        #self.fields['course_of_study'].queryset = Course.objects.none()
         self.fields['current_level'].empty_label = 'Please select program'
-        #self.fields['current_level'].queryset = Level.objects.none()
         
         self.helper = FormHelper()
         self.helper.attrs['hx-post'] = reverse('applicant:save-academic-info')
-
+        self.helper.attrs['hx-target'] = 'this'
         self.helper.layout = Layout(
             Row(
                 Column(
@@ -128,6 +128,7 @@ class AccountBankForm(forms.ModelForm):
         
         self.helper = FormHelper()
         self.helper.attrs['hx-post'] = reverse('applicant:save-bank-info')
+        self.helper.attrs['hx-target'] = 'this'
         self.helper.layout = Layout(
             Row(
                 Column('bank', css_class='form-group col-md-6 mb-0'),
@@ -154,25 +155,6 @@ class SchoolAttendedForm(forms.ModelForm):
         self.fields['certificate_obtained'].widget.attrs['placeholder'] = 'Enter certificate obtained from the school'
         self.fields['year_from'].widget.attrs['placeholder'] = 'Enter year you started the school'
         self.fields['year_to'].widget.attrs['placeholder'] = 'Enter year you finished the school'
-        
-        self.helper = FormHelper()
-        self.helper.attrs['hx-post'] = reverse('applicant:save-referee')
-        self.helper.layout = Layout(
-            Row(
-                Column('school_name', css_class='form-group col-md-6 mb-0'),
-                Column('certificate_obtained', css_class='form-group col-md-6 mb-0'),
-                css_class='form-row'
-            ),
-            Row(
-                Column('year_from', css_class='form-group col-md-6 mb-0'),
-                Column('year_to', css_class='form-group col-md-6 mb-0'),
-                css_class='form-row'
-            ),
-            Div(
-                Submit('save', 'Save School'),
-                css_class='text-end'
-            )
-        )
 
 class RefereeForm(forms.ModelForm):
     
@@ -189,6 +171,7 @@ class RefereeForm(forms.ModelForm):
         
         self.helper = FormHelper()
         self.helper.attrs['hx-post'] = reverse('applicant:save-referee')
+        self.helper.attrs['hx-target'] = 'this'
         self.helper.layout = Layout(
             'fullname',
             Row(
@@ -206,7 +189,7 @@ class DocumentForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         
-        if self.user is None:
+        if not hasattr(self, 'instantance') and self.user is None:
             raise ValueError('User argument is required!!!')
 
         super().__init__(*args, **kwargs)
@@ -226,6 +209,7 @@ class DocumentForm(forms.Form):
             self.documents_fieldnames.append(fieldname)
         
         self.helper = FormHelper()
+        self.helper.attrs['hx-target'] = 'this'
         self.helper.attrs['hx-post'] = reverse('applicant:save-document')
         self.helper.attrs['hx-encoding'] = 'multipart/form-data'
         self.helper.layout = Layout(

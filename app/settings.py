@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-k=qb^4e*jji6+p2p1!jpxnz=pz92+h@(ihw78-sf3#4vt*j0u5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = not False
 ALLOWED_HOSTS = ['usimam12.pythonanywhere.com', 'localhost']
 
 
@@ -140,6 +140,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "/user/dashboard"
