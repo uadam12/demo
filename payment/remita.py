@@ -99,7 +99,10 @@ class Remita:
             'nameOnAccount': get_first_name() + ' ' + get_last_name()
         }
 
-    def get_nin_info(self, nin):
+    def get_nin_data(self, nin):
+        if len(nin) != 11:
+            return {}
+
         return {
             'firstName': get_first_name(),
             'lastName': get_last_name(),
@@ -109,7 +112,7 @@ class Remita:
             'gender': get_gender(),
         }
 
-    def get_bvn_info(self, bvn):
-        return self.get_nin_info(bvn)
+    def get_bvn_data(self, bvn):
+        return self.get_nin_data(bvn)
 
 remita = Remita()

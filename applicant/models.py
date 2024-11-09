@@ -13,7 +13,7 @@ class PersonalInformation(models.Model):
         ('Female', 'Female')
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='personal_info')
-    guardian_name = models.CharField(max_length=50)
+    guardian_name = models.CharField(max_length=50, null=True)
     guardian_phone_number = models.CharField(max_length=15, default='080XXXXXXXX', validators=[validate_phone_number])
     phone_number = models.CharField(max_length=15, unique=True, validators=[validate_phone_number])
     gender = models.CharField(max_length=10, choices=GENDER)

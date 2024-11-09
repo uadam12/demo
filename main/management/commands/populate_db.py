@@ -45,8 +45,8 @@ class Command(BaseCommand):
         Bank.objects.bulk_create(bank_models)
 
         # Add LGA models
-        available_lgas = [lga.name for lga in LGA.objects.all()]
-        lga_models = [LGA(name=lga) for lga in lgas if not lga in available_lgas]
+        available_lgas = [lga.code for lga in LGA.objects.all()]
+        lga_models = [LGA(code=code, name=name) for code, name in lgas.items() if not code in available_lgas]
         LGA.objects.bulk_create(lga_models)
 
         # Add programs and their levels

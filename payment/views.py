@@ -28,6 +28,7 @@ def registration_fee(request):
         verification_url = reverse('payment:verify-reg-fee-payment')
         verification_url = request.build_absolute_uri(verification_url)
         url = payment.url(amount, request.user, verification_url)
+        print(url, verification_url)
         return redirect(url)
 
     return render(
