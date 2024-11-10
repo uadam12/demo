@@ -4,6 +4,7 @@ db.sqlite3
 __pycache__/
 migrations/
 media/*/
+!media/
 !media/*.png
 !media/*.jpg
 !media/*.svg
