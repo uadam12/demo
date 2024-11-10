@@ -48,10 +48,10 @@ female_names = [
     "Patience", "Miriam", "Sarah", "Hannah", "Tabitha", "Eunice", "Phoebe", "Priscilla", "Julia", "Veronica"
 ]
 
-names = male_names + female_names
-
-def get_first_name():
-    return random.choice(names)
+def get_first_name(gender):
+    if gender == 'Male':
+        return random.choice(male_names)
+    return random.choice(female_names)
 
 def get_last_name():
     return random.choice(male_names)
@@ -100,16 +100,17 @@ class Remita:
         }
 
     def get_nin_data(self, nin):
-        if len(nin) != 11:
-            return {}
+        if len(nin) != 11: return {}
+        
+        gender = get_gender()
 
         return {
-            'firstName': get_first_name(),
+            'firstName': get_first_name(gender),
             'lastName': get_last_name(),
             'dateOfBirth': get_date_of_birth(),
             'stateOfOriginCode': get_state_code(nin),
             'lgaofOriginCode': get_lga_code(),
-            'gender': get_gender(),
+            'gender': gender,
         }
 
     def get_bvn_data(self, bvn):
