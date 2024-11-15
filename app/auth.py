@@ -56,7 +56,7 @@ def applicant_only(view):
             messages.info(request, 'This page is for applicant only.')
             return redirect('official:dashboard')
         
-        if  request.user.paid_registration_fee:
+        if not request.user.paid_registration_fee:
             messages.info(request, 'You need to pay registration fee')
             return redirect('payment:registration-fee')
 

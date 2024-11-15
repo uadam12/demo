@@ -13,7 +13,7 @@
             </div>
 
             <label for="id_picture" class="position-absolute top-50 start-50 translate-middle opacity-50">
-                <i class="fa fa-camera fa-lg"></i>
+                <i class="bi bi-camera h1"></i>
             </label>
         </form>
     </div>
@@ -26,13 +26,13 @@
         <p>
             {{ user.personal_info.gender }} - {{ user.personal_info.date_of_birth }}
         </p>
-    </div>
+    </div> <br>
 
     <ul class="list-group list-group-flush">
         <li class="list-group-item">
             <div class="d-flex justify-content-between align-items-center">
                 <b>Email: </b>
-                <span>{{ user.email }}</span>
+                <span class="text-break" role="button">{{ user.email }}</span>
             </div>
         </li>
 

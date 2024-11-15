@@ -7,7 +7,7 @@ from .forms import Article, ArticleForm, ContactForm
 
 
 def index(request):
-    return render(request, 'main/demo')
+    return render(request, 'main/index')
 
 def news(request):
     articles = Article.objects.all()

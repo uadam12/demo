@@ -1,0 +1,60 @@
+/* Loader Section */
+#loader {
+    place-content: center;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0; left: 0;
+    background-color: rgba(0, 0, 0, .6);
+    transform: scale(0);
+    transition: transform 0.5s;
+}
+#loader.show, #request-indicator.show {
+    transform: scale(1);
+}
+
+#loader > div {
+    background-color: var(--bs-light);
+    color: var(--bs-green);
+    padding: 12px 20px;
+    border-radius: 10px;
+}
+
+#loader img {
+    width: 3cm;
+    height: auto;
+}
+
+.amount::before {
+    content: '\20A6 ';
+    margin-inline-end: 2px;
+}
+
+#request-indicator {
+    position: fixed;
+    top: 5mm;
+    right: 5mm;
+    padding: 0.2cm;
+    background-color: rgba(255, 255, 255, 0.5);
+    width: fit-content;
+    height: fit-content;
+    border-radius: 10px;
+    transform: scale(0);
+    transition: transform 0.5s;
+    text-align: end;
+}
+
+#request-indicator > img {
+    width: 1.5cm;
+    height: auto;
+}
+
+.htmx-indicator {
+    display: none;
+    transition: transform 0.5s;
+}
+
+.htmx-request .htmx-indicator, .htmx-indicator.htmx-indicator {
+    display: inline;
+    transform: scale(1);
+}

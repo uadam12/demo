@@ -24,7 +24,11 @@ from .forms import (
 @applicant_only
 def dashboard(request):
     applications = request.user.applications.all()
-    return render(request, 'applicants/dashboard', title='BSSB Dashboard', applications=applications)
+    return render(
+        request, 'applicants/dashboard', 
+        applications = applications,
+        title = 'BSSB Dashboard', 
+    )
 
 @applicant_only
 def change_profile_picture(request):
@@ -54,7 +58,7 @@ def profile(request):
         referee_form = RefereeForm(instance=referee),
         schools = SchoolAttended.objects.filter(user=request.user),
         document_form = DocumentForm(user=user),
-        documents = documents
+        documents = documents, with_htmx = True,
     )
 
 @applicant_only

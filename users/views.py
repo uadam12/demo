@@ -6,9 +6,6 @@ from app import render, is_post
 from app.views import update_view
 from app.token import verify_token
 from app.auth import login_required, logout_required, blocked_required
-from board.models import LGA
-from applicant.models import PersonalInformation
-from payment.remita import remita
 from .forms import RegisterForm, LoginForm, EmailForm, UserForm, ProfilePictureForm, ResetPasswordForm
 from .emails import send_activation_email, send_recovery_email
 
@@ -42,57 +39,18 @@ def register(request):
         form = RegisterForm(request.POST)
 
         if form.is_valid():
-            data = form.cleaned_data
-            nin = data.get('nin', '')
-            bvn = data.get('bvn', '')
-            
-            nin_data = remita.get_nin_data(nin)
-            bvn_data = remita.get_bvn_data(bvn)
-            nin_state_code = nin_data.get('stateOfOriginCode', '')
-            bvn_state_code = bvn_data.get('stateOfOriginCode', '')
-            lga_code = nin_data.get('lgaofOriginCode', '')
-            
-            if nin_state_code != 'BO' or bvn_state_code != 'BO':
-                error = 'You are not applicable for this program'
-                form.add_error('nin', error)
-                form.add_error('bvn', error)
+            user = form.save()
+            sent = send_activation_email(request, user)
 
-            else:
-                lga = LGA.objects.filter(code=lga_code).first()
-                nin_date_of_birth = nin_data.get('dateOfBirth', '')
-                bvn_date_of_birth = bvn_data.get('dateOfBirth', '')
-                nin_firstname = nin_data.get('firstName', '')
-                nin_lastname = nin_data.get('lastName', '')
-                nin_gender = nin_data.get('gender')
-                
-                if nin_date_of_birth == bvn_date_of_birth:
-                    form.add_error(None, 'Data mismatch')
-                else:
-                    user = form.save(commit=False)
-                    user.is_active = False
-                    user.first_name = nin_firstname
-                    user.last_name = nin_lastname
-                    sent = send_activation_email(request, user)
-
-                    if sent:
-                        personal_info = PersonalInformation(
-                            phone_number = data.get('phone_number'),
-                            gender = nin_gender,
-                            date_of_birth = nin_date_of_birth,
-                            nin = nin, bvn = bvn, user = user,
-                            local_government_area = lga
-                        )                        
-                        
-                        user.save()
-                        personal_info.save()
-                        login_user(request, user)
-                        messages.success(request, 'Account created successfully!')
-                        return redirect('user:inactive')
-
+            if sent:
+                login_user(request, user)
+                messages.success(request, 'Account created successfully!')
+                return redirect('user:inactive')
 
     return render(
         request, 'users/register',
         title = 'BSSB Registration',
+        with_htmx = True,
         form = form
     )
 

@@ -1,4 +1,8 @@
+// Get Elements from DOM
 const themeSwitcher = document.getElementById('dark-mode');
+const loader = document.getElementById('loader');
+
+// Switch theme
 const getTheme = () => localStorage.getItem('theme');
 const setTheme = theme => localStorage.setItem('theme', theme);
 
@@ -21,3 +25,9 @@ themeSwitcher.addEventListener('change', () => {
 });
 
 switchTheme();
+
+
+// Hide Page Loader
+window.onload = function() {
+    loader.classList.remove('show');
+}

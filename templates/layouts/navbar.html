@@ -4,7 +4,7 @@
 </button>
 
 <div class="collapse navbar-collapse" id="bssb-navbar">
-    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-md-center">
         <li class="nav-item">
             <a class="nav-link" href="{% url 'main:news' %}">
                 <i class="bi bi-newspaper"></i> 
@@ -29,25 +29,54 @@
         <li class="nav-item">
             <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" id="dark-mode">
-                <label class="form-check-label" for="dark-mode">Dark Mode</label>
+                <label class="form-check-label" for="dark-mode">
+                    Dark Mode
+                </label>
              </div>
         </li>
+    </ul>
 
-        <li>{% if user.is_authenticated %}
-            <form method="post" class="ps-3" action="{% url 'user:logout' %}">
+    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-md-center">
+        {% if user.is_authenticated %}
+        {% if user.access_code == 1 %}
+        <li class="nav-item">
+            <a href="{% url 'applicant:profile' %}" class="nav-link">
+                <img src="{{ user.picture.url }}" width="35px" height="35px" alt="avater" class="img rounded-circle">
+                Profile
+            </a>
+        </li>
+        {% endif %}
+        
+
+        <li class="nav-item">
+            <a href="{% url user.dashboard %}" class="nav-link">
+                <i class="bi bi-house"></i>
+                Dashboard
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <form method="post" action="{% url 'user:logout' %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">
                     <i class="bi bi-box-arrow-left"></i>
                     Logout
                 </button>
             </form>
+        </li>
         {% else %}
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'user:login' %}">Login</a>
+            <a class="nav-link" href="{% url 'user:login' %}">
+                <i class="bi bi-box-arrow-in-right"></i>
+                Login
+            </a>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'user:register' %}">Register</a>
+            <a class="nav-link" href="{% url 'user:register' %}">
+                <i class="bi bi-person-plus"></i>
+                Register
+            </a>
         </li>
         {% endif %}
     </ul>
