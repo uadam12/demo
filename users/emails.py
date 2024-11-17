@@ -32,11 +32,8 @@ def send_activation_email(request, user) -> bool:
     email_sent = bssb_send_email(mail_subject, message, [user.email])
 
     if email_sent: 
-        messages.info(request, activation_link)
-        messages.success(
-            request, 
-            f"Dear {user}, please go to your email address to activate your account."
-        )
+        msg = f"Dear {user}, please go to your email address to activate your account."
+        messages.success(request, msg)
         return True
     
     messages.error(
@@ -61,11 +58,9 @@ def send_recovery_email(request, user) -> bool:
     email_sent = bssb_send_email(mail_subject, message, [user.email])
     
     if email_sent: 
-        messages.info(request, recovery_link)
+        msg = f"Dear {user}, please go to your email address to recover your account."
         messages.success(
-            request, 
-            f"Dear {user}, please go to your email address to recover your account."
-        )
+            request, msg)
         return True
     
     messages.error(

@@ -7,7 +7,6 @@ from .forms import Article, ArticleForm, ContactForm
 
 
 def index(request):
-    messages.success(request, 'Yess')
     return render(request, 'main/index')
 
 def news(request):
