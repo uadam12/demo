@@ -13,8 +13,6 @@ def bvn(request):
     return HttpResponse(as_crispy_field(form['bvn']))
 
 def email(request):
-    import time
-    time.sleep(2)
     form = RegisterForm(request.POST)
     form.is_valid()
     return HttpResponse(as_crispy_field(form['email']))
