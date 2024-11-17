@@ -3,9 +3,12 @@ from django import forms
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.utils.safestring import mark_safe
 from django.shortcuts import get_object_or_404
-from crispy_forms.layout import Layout, Row, Column, Div, Submit, Field, HTML
+from crispy_forms.layout import Layout, Row, Column, Div, Submit
+from crispy_forms.bootstrap import PrependedText
 from crispy_forms.helper import FormHelper
 from app.validators import validate_phone_number
 from board.models import LGA
@@ -225,20 +228,38 @@ class RegisterForm(UserCreationForm):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
-                Column('email', css_class='form-group col-md-6 mb-0'),
-                Column('phone_number', css_class='form-group col-md-6 mb-0'),
+                Column(
+                    PrependedText('email', mark_safe("<i class='bi bi-envelope'></i>")), 
+                    css_class='form-group col-md-6 mb-0'
+                ),
+                Column(
+                    PrependedText('phone_number', mark_safe("<i class='bi bi-phone'></i>")), 
+                    css_class='form-group col-md-6 mb-0'
+                ),
                 css_class='form-row mb-2'
             ),
             
             Row(
-                Column('nin', css_class='form-group col-md-6 mb-0'),
-                Column('bvn', css_class='form-group col-md-6 mb-0'),
+                Column(
+                    PrependedText('nin', "NIN"), 
+                    css_class='form-group col-md-6 mb-0'
+                ),
+                Column(
+                    PrependedText('bvn', "BVN"), 
+                    css_class='form-group col-md-6 mb-0'
+                ),
                 css_class='form-row'
             ),
             
             Row(
-                Column('password1', css_class='form-group col-md-6 mb-0'),
-                Column('password2', css_class='form-group col-md-6 mb-0'),
+                Column(
+                    PrependedText('password1', mark_safe("<i class='bi bi-lock'></i>")), 
+                    css_class='form-group col-md-6 mb-0'
+                ),
+                Column(
+                    PrependedText('password2', mark_safe("<i class='bi bi-lock'></i>")), 
+                    css_class='form-group col-md-6 mb-0'
+                ),
                 css_class='form-row'
             ),
         )
@@ -268,3 +289,7 @@ class LoginForm(forms.Form):
         
         self.helper = FormHelper()
         self.helper.form_tag = False
+        self.helper.layout = Layout(
+            PrependedText('email', mark_safe("<i class='bi bi-envelope'></i>")),
+            PrependedText('password', mark_safe("<i class='bi bi-lock'></i>")),
+        )

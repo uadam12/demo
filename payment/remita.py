@@ -79,7 +79,7 @@ def get_gender():
     )
 
 class Remita:
-    def get_account_name(self, bvn, bank_code, account_num):
+    def get_account_details(self, bvn, bank_code, account_num):
         if account_num.startswith('00'):
             return {
                 'status': 'Invalid',
@@ -95,8 +95,9 @@ class Remita:
             'message': 'Valid Account',
             'valid': True,
             'bvn': bvn,
+            'bankCode': bank_code,
             'accountNumber': account_num,
-            'nameOnAccount': get_first_name() + ' ' + get_last_name()
+            'nameOnAccount': get_first_name('Male') + ' ' + get_last_name()
         }
 
     def get_nin_data(self, nin):

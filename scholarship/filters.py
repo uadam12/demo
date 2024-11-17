@@ -49,23 +49,10 @@ class Filter(df.FilterSet):
         form.helper = FormHelper()
         form.helper.form_method = 'get'
         form.helper.layout = Layout(
-            Row(
-                Column('application_id', css_class='form-group col-md-4 mb-0'),
-                Column('status', css_class='form-group col-md-4 mb-0'),
-                Column('bank', css_class='form-group col-md-4 mb-0'),
-                css_class='form-row'
-            ),
-            Row(
-                Column('institution', css_class='form-group col-md-4 mb-0'),
-                Column('program', css_class='form-group col-md-4 mb-0'),
-                Column('course_of_study', css_class='form-group col-md-4 mb-0'),
-                css_class='form-row'
-            ),
-            Div(
-                Submit('filter', "Filter Applicants"),
-                css_class='text-end'
-            )
+            'application_id', 'status', 'bank', 
+            'institution', 'program', 'course_of_study',
         )
+        form.helper.add_input(Submit('filter', "Filter Applicants"))
         
         return form
 

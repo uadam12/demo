@@ -2,29 +2,39 @@
 
 
 {% block content %}
-    <h1 class="text-center text-primary">
-        Currently Open Scholarship
-    </h1>
+{% if scholarships %}
+<h2 class="text-center text-secondary">Available Scholarships</h2>
 
-    <div class="row col-12 col-ms-6 col-md-4">
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
     {% for scholarship in scholarships %}
-    <div class="card">
-        <div class="card-body">
-            <a href="{% url 'applicant:apply' id=scholarship.id %}" class="card-link">
-                {{ scholarship }}
-            </a>
-        </div>
-    </div>
-
-    {% empty %}
-    <div class="card mx-auto">
-        <div class="card-body">
-            <h3 class="card-title">
-                There is no open scholarship currently, please check back later.
-            </h3>
+    <div class="col">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ scholarship }}</h3>
+            </div>
+    
+            <div class="card-body">
+                <p>{{ scholarship.description }}</p>
+            </div>
+    
+            <div class="card-footer">
+                <a href="{% url 'applicant:apply' id=scholarship.id %}" class="btn btn-primary">Apply Now</a>
+            </div>
         </div>
     </div>
     {% endfor %}
+</div>
+{% else %}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">No available Scholarship</h1>
     </div>
-    
+
+    <div class="card-body">
+        <p class="text-center">
+            There is no open scholarship currently, please check back later for a wonderfull scholarship opportunity.
+        </p>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

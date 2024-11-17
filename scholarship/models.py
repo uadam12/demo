@@ -10,11 +10,11 @@ from users.models import User
 
 # Create your models here.
 class Scholarship(models.Model):
-    title = models.CharField(max_length=150)
     description = models.TextField()
-    application_fee = models.DecimalField(max_digits=6, decimal_places=2)
+    title = models.CharField(max_length=150)
     application_commence = models.DateTimeField()
     application_deadline = models.DateTimeField()
+    application_fee = models.DecimalField(max_digits=6, decimal_places=2)
     criteria = models.ManyToManyField(Criterion, related_name='public_scholarships')
     requirements = models.ManyToManyField(Requirement, related_name='public_scholarships')
     

@@ -4,14 +4,15 @@
     <td>{{ school.certificate_obtained }}</td>
     <td>{{ school.year_from }}</td>
     <td>{{ school.year_to }}</td>
-    
     <td>
-        <button class="btn btn-warning" hx-get="{% url 'applicant:update-school' pk=school.pk %}" hx-target="#dialog">
-            <i class="fa fa-pencil"></i>
-        </button>
-        <button class="btn btn-danger" hx-get="{% url 'applicant:delete-school' pk=school.pk %}" hx-target="#dialog">
-            <i class="fa fa-trash"></i>
-        </button>
+        <div class="btn-group">
+            <button class="btn btn-warning" hx-get="{% url 'applicant:update-school' pk=school.pk %}" hx-target="#dialog">
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-danger" hx-get="{% url 'applicant:delete-school' pk=school.pk %}" hx-target="#dialog">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
     </td>
 </tr>
 {% endfor %}

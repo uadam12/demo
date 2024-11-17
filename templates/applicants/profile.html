@@ -16,7 +16,7 @@
                 <!-- Nav tabs -->
                 {% include "parts/user-tabs.html" %}
             </div>
-        
+
             <div class="card-body">
                 <div class='tab-content'>
                     <!-- Tab panes -->
@@ -25,28 +25,34 @@
                         <hr>
                         {% crispy applicant_form %}
                     </div>
-        
+
                     <div class="tab-pane fade" id="academic">
                         <h2 class="text-center">Academic information</h2>
                         <hr>
                         {% crispy academic_form %}
                     </div>
-        
+
                     <div class="tab-pane fade" id="account">
                         <h2 class="text-center">Bank Account Details</h2>
-                        <hr>
+
+                        <p class="d-flex justify-content-between align-items-center">
+                            <strong>Account Name</strong>
+                            <span>{{ user.account_bank.account_name }}</span>
+                        </p>
+
                         {% crispy bank_form %}
                     </div>
-        
+
                     <div class="tab-pane fade" id="schools">
                         <div class="d-flex justify-content-between align-items-center">
                             <h2 class="text-center">Schools Attended</h2>
-        
-                            <button hx-get="{% url 'applicant:add-school' %}" hx-target="#dialog" class="btn btn-primary">
+
+                            <button hx-get="{% url 'applicant:add-school' %}" hx-target="#dialog"
+                                class="btn btn-primary">
                                 Add a School
-                              </button>
+                            </button>
                         </div>
-        
+
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover table-striped">
                                 <tr>
@@ -56,14 +62,15 @@
                                     <th>Year Finish</th>
                                     <th>Actions</th>
                                 </tr>
-        
-                                <tbody hx-trigger="load, schoolListChanged from:body" hx-get="{% url 'applicant:schools-attended' %}" hx-target="this">
+
+                                <tbody hx-trigger="load, schoolListChanged from:body"
+                                    hx-get="{% url 'applicant:schools-attended' %}" hx-target="this">
                                     {% include "../parts/schools-attended.html" %}
-                                  </tbody>
+                                </tbody>
                             </table>
                         </div>
                     </div>
-        
+
                     <div class="tab-pane fade" id="documents">
                         <h2 class="text-center">Upload Documents</h2>
                         <hr>
@@ -74,19 +81,21 @@
                                     <div class="carousel-inner">
                                         {% for document in documents %}
                                         <div class="carousel-item {% if forloop.first %} active {% endif %}">
-                                            <img src="{{ document.image.url }}" class="d-block w-100" alt="{{ document.requirement.text }}">
+                                            <img src="{{ document.image.url }}" class="d-block w-100"
+                                                alt="{{ document.requirement.text }}">
                                             <div class="carousel-caption d-none d-md-block">
                                                 <h5>{{ document.requirement.text }}</h5>
                                             </div>
                                         </div>
                                         {% endfor %}
                                     </div>
-                                    
+
                                     <button class="carousel-control-prev" type="button"
                                         data-bs-target="#carouselExampleControls" data-bs-slide="prev">
                                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                         <span class="visually-hidden">Previous</span>
                                     </button>
+
                                     <button class="carousel-control-next" type="button"
                                         data-bs-target="#carouselExampleControls" data-bs-slide="next">
                                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
@@ -95,14 +104,14 @@
                                 </div>
                             </div>
                             {% endif %}
-                            
-        
+
+
                             <div class="col-md">
                                 {% crispy document_form %}
                             </div>
                         </div>
                     </div>
-        
+
                     <div class="tab-pane fade" id="referees">
                         <h2 class="text-center">Referee Information</h2>
                         <hr>
@@ -123,39 +132,26 @@
 </div>
 
 <script>
-    (function () {
-        const modal = new bootstrap.Modal(document.getElementById("modal"))
+    const modal = new bootstrap.Modal(document.getElementById("modal"))
 
-        htmx.on("htmx:afterSwap", (e) => {
-            // Response targeting #dialog => show the modal
-            if (e.detail.target.id == "dialog") {
-                modal.show()
-            }
-        })
+    htmx.on("htmx:afterSwap", (e) => {
+        // Response targeting #dialog => show the modal
+        if (e.detail.target.id == "dialog") {
+            modal.show()
+        }
+    })
 
-        htmx.on("htmx:beforeSwap", (e) => {
-            // Empty response targeting #dialog => hide the modal
-            if (e.detail.target.id == "dialog" && !e.detail.xhr.response) {
-                modal.hide()
-                e.detail.shouldSwap = false
-            }
-        })
+    htmx.on("htmx:beforeSwap", (e) => {
+        // Empty response targeting #dialog => hide the modal
+        if (e.detail.target.id == "dialog" && !e.detail.xhr.response) {
+            modal.hide()
+            e.detail.shouldSwap = false
+        }
+    })
 
-        // Remove dialog content after hiding
-        htmx.on("hidden.bs.modal", () => {
-            document.getElementById("dialog").innerHTML = ""
-        })
-    })();
-
-    (function () {
-        const toastElement = document.getElementById("toast")
-        const toastBody = document.getElementById("toast-body")
-        const toast = new bootstrap.Toast(toastElement, { delay: 5000 })
-
-        htmx.on("showMessage", (e) => {
-            toastBody.innerText = e.detail.value
-            toast.show()
-        })
-    })();
+    // Remove dialog content after hiding
+    htmx.on("hidden.bs.modal", () => {
+        document.getElementById("dialog").innerHTML = ""
+    })
 </script>
 {% endblock %}

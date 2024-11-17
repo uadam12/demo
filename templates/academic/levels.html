@@ -6,7 +6,7 @@
         <h1>{{ header|default:'Academic Levels' }}</h1>
 
         <a href="{% url 'academic:create-level' %}" class="btn btn-success">
-            <i class="fa fa-plus"></i> Create
+            <i class="bi bi-plus"></i> Create
         </a>
     </div>
 
@@ -25,13 +25,15 @@
                 <td>{{ level.name }}</td>
                 <td>{{ level.code }}</td>
                 <td>
-                    <a href="{% url 'academic:update-level' id=level.id %}" class="btn btn-warning">
-                        <i class="fa fa-pencil"></i>
-                    </a>
-            
-                    <a href="{% url 'academic:delete-level' id=level.id %}" class="btn btn-danger">
-                        <i class="fa fa-trash"></i>
-                    </a>
+                    <div class="btn-group">
+                        <a href="{% url 'academic:update-level' id=level.id %}" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                
+                        <a href="{% url 'academic:delete-level' id=level.id %}" class="btn btn-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
                 </td>
             </tr>
             {% empty %}

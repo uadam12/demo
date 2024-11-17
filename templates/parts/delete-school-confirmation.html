@@ -4,8 +4,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body">
-        <p>Delete {{ school.school_name }}?</p>
-        <p class="text-muted">This action can not be undone</p>
+        <p class="text-danger">Are you sure you want to delete {{ school.school_name }}?</p>
+        <p class="text-muted">This action is permanent and cannot be reverse.</p>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">

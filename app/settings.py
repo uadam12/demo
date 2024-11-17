@@ -54,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'app.toast_messages.ToastMiddlewere'
 ]
 
 ROOT_URLCONF = 'app.urls'
@@ -145,12 +146,13 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "/user/dashboard"
 LOGIN_URL = "/user/login"
+MESSAGE_LEVEL = messages.DEBUG
 MESSAGE_TAGS = {
-    messages.DEBUG: 'alert-secondary',
-    messages.INFO: 'alert-info',
-    messages.SUCCESS: 'alert-success',
-    messages.WARNING: 'alert-warning',
-    messages.ERROR: 'alert-danger',
+    messages.DEBUG: 'bg-light',
+    messages.INFO: 'text-white bg-primary',
+    messages.SUCCESS: 'text-white bg-success',
+    messages.WARNING: 'text-dark bg-warning',
+    messages.ERROR: 'text-white bg-danger',
 }
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 #EMAIL_USE_TLS = True

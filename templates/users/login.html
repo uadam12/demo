@@ -13,26 +13,18 @@
         {% crispy form %}
 
         <div class="text-end">
-            <p>
+            <a class="text-decoration-none" href="{% url 'user:forgot-password' %}">
                 Forgot your password?
-                <a class="btn btn-danger" href="{% url 'user:forgot-password' %}">
-                    Recover it
-                </a>
-            </p>
-
-            <p>
-                Don't have an account?
-                <a href="{% url 'user:register' %}" class="btn btn-success">
-                    Create one
-                </a>
-            </p>
+            </a>
         </div>
     </div>
 
-    <div class="card-footer text-end">
-        <button class="btn btn-primary">
-            Login <i class="bi bi-paper-plane"></i>
-        </button>
+    <div class="card-footer">
+        <div class="d-grid">
+            <button class="btn btn-primary">
+                <i class="bi bi-box-arrow-in-right"></i> Login
+            </button>
+        </div>
     </div>
 </form>
 {% endblock content %}

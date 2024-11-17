@@ -7,7 +7,7 @@
         <h1>Courses of studies</h1>
 
         <a href="{% url 'academic:create-course' %}" class="btn btn-success">
-            <i class="fa fa-plus"></i> Create
+            <i class="bi bi-plus"></i> Create
         </a>
     </div>
 
@@ -26,13 +26,15 @@
                 <td>{{ course.title }}</td>
                 <td>{{ course.course_type }}</td>
                 <td>
-                    <a href="{% url 'academic:update-course' id=course.id %}" class="btn btn-warning">
-                        <i class="fa fa-pencil"></i>
-                    </a>
-            
-                    <a href="{% url 'academic:delete-course' id=course.id %}" class="btn btn-danger">
-                        <i class="fa fa-trash"></i>
-                    </a>
+                    <div class="btn-group">
+                        <a href="{% url 'academic:update-course' id=course.id %}" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                
+                        <a href="{% url 'academic:delete-course' id=course.id %}" class="btn btn-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
                 </td>
             </tr>
             {% empty %}

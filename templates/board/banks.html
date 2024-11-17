@@ -23,15 +23,15 @@
                 <td>{{ forloop.counter }}</td>
                 <td>{{ bank.name }}</td>
                 <td>{{ bank.code }}</td>
-                <td>
+                <td class="btn-group">
                     <a href="{% url 'board:bank' code=bank.code %}" class="btn btn-primary">
-                        <i class="fa fa-eye"></i>
+                        <i class="bi bi-eye"></i>
                     </a>
                     <a href="{% url 'board:update-bank' code=bank.code %}" class="btn btn-warning">
-                        <i class="fa fa-pencil"></i>
+                        <i class="bi bi-pencil"></i>
                     </a>
                     <a href="{% url 'board:delete-bank' code=bank.code %}" class="btn btn-danger">
-                        <i class="fa fa-trash"></i>
+                        <i class="bi bi-trash"></i>
                     </a>            
                 </td>
             </tr>

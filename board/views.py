@@ -1,4 +1,3 @@
-from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from app import render
 from app.views import create_view, delete_view, update_view
@@ -142,8 +141,8 @@ def create_lga(request):
         header='Create Local Government Area'
     )
 
-def update_lga(request, id):
-    lga = get_object_or_404(LGA, id=id)
+def update_lga(request, code):
+    lga = get_object_or_404(LGA, code=code)
     
     return update_view(
         request, instance=lga, 
@@ -152,8 +151,8 @@ def update_lga(request, id):
         header='Update Local Government Area'
     )
     
-def delete_lga(request, id):
-    lga = get_object_or_404(LGA, id=id)
+def delete_lga(request, code):
+    lga = get_object_or_404(LGA, code=code)
     
     return delete_view(
         request, model=lga,

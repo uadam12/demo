@@ -11,6 +11,7 @@ from app.auth import applicant_only
 from scholarship.models import Scholarship
 from scholarship.forms import ApplicationForm, Application
 from payment.models import ApplicationFEE
+from payment.remita import remita
 from .forms import (
     PersonalInformationForm, PersonalInformation,
     AcademicInformationForm, AcademicInformation,
@@ -18,6 +19,11 @@ from .forms import (
     SchoolAttendedForm, SchoolAttended,
     DocumentForm, Document
 )
+
+def render_form(request, form):
+    ctx = {}
+    ctx.update(csrf(request))
+    return HttpResponse(render_crispy_form(form, context=ctx))
 
 
 # Create your views here.
@@ -35,8 +41,10 @@ def change_profile_picture(request):
     if is_post(request):
         form = ProfilePictureForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid() and form.save():
+            messages.success(request, 'Profile picture updated successfully!!!')
             return render(request, 'parts/profile-img')
-    
+
+    messages.error(request, 'Invalid request')
     return HttpResponse(status=204)
 
 @applicant_only
@@ -66,26 +74,16 @@ def personal_information(request):
     form = PersonalInformation()
 
     if is_post(request):
-        personal_info = get_or_none(PersonalInformation, user=request.user)
-        form = PersonalInformationForm(request.POST, instance=personal_info)
+        info = get_or_none(PersonalInformation, user=request.user)
+        form = PersonalInformationForm(request.POST, instance=info)
 
         if form.is_valid():
-            personal_info = form.save(False)
-            personal_info.user = request.user
-            personal_info.save()
+            info = form.save(False)
+            info.user = request.user
+            info.save()
 
-            return HttpResponse(
-                status=204,
-                headers={
-                    'HX-Trigger': json.dumps({
-                        "showMessage": "Personal Information Save successfully."
-                    })
-                })
-    
-    ctx = {}
-    ctx.update(csrf(request))
-
-    return HttpResponse(render_crispy_form(form))
+            messages.success(request, 'Personal Information save successfully.')
+    return render_form(request, form)
 
 
 @applicant_only
@@ -93,25 +91,16 @@ def academic_information(request):
     form = AcademicInformationForm()
 
     if is_post(request):
-        academic_info = get_or_none(AcademicInformation, user=request.user)
-        form = AcademicInformationForm(request.POST, instance=academic_info)
+        info = get_or_none(AcademicInformation, user=request.user)
+        form = AcademicInformationForm(request.POST, instance=info)
 
         if form.is_valid():
-            academic_info = form.save(False)
-            academic_info.user = request.user
-            academic_info.save()
-            return HttpResponse(
-                status=204,
-                headers={
-                    'HX-Trigger': json.dumps({
-                        "showMessage": "Academic Information Save successfully."
-                    })
-                })
-    
-    ctx = {}
-    ctx.update(csrf(request))
-
-    return HttpResponse(render_crispy_form(form))
+            info = form.save(False)
+            info.user = request.user
+            info.save()
+            
+            messages.success(request, "Academic Information Save successfully.")
+    return render_form(request, form)
 
 @applicant_only
 def account_details(request):
@@ -120,23 +109,25 @@ def account_details(request):
     if is_post(request):
         account_bank = get_or_none(AccountBank, user=request.user)
         form = AccountBankForm(request.POST, instance=account_bank)
-        
-        if form.is_valid():
-            account_bank = form.save(False)
-            account_bank.user = request.user
-            account_bank.save()
-            return HttpResponse(
-                status=204,
-                headers={
-                    'HX-Trigger': json.dumps({
-                        "showMessage": "Account bank details Save successfully."
-                    })
-                })
-    
-    ctx = {}
-    ctx.update(csrf(request))
 
-    return HttpResponse(render_crispy_form(form))
+        if form.is_valid():
+            bvn = request.user.personal_info.bvn
+            bank_code = form.cleaned_data['bank']
+            account_number = form.cleaned_data['account_number']
+            
+            account_details = remita.get_account_details(bvn, bank_code, account_number)
+
+            if account_details.get('valid'):
+                account_name = account_details.get('nameOnAccount')
+                account_bank:AccountBank = form.save(False)
+                account_bank.account_name = account_name
+                account_bank.user = request.user
+                account_bank.save()
+                messages.success(request, "Account bank details Save successfully.")
+                messages.info(request, f"Account name: {account_name}")
+            else: messages.error(request, account_details.get('message'))
+
+    return render_form(request, form)
 
 @applicant_only
 def schools_attended(request):
@@ -153,14 +144,12 @@ def add_school(request):
             school = form.save(False)
             school.user = request.user
             school.save()
-            return HttpResponse(
-                status=204,
-                headers={
-                    'HX-Trigger': json.dumps({
-                        "schoolListChanged": None,
-                        "showMessage": f"{school.school_name} added."
-                    })
-                })
+
+            response = HttpResponse(status=204)
+            response['HX-Trigger'] = 'schoolListChanged'
+            
+            messages.success(request, f"{school} added.")
+            return response
 
     return render(request, 'parts/school-form', form=form, modal_header='Add School Attended')
 
@@ -175,14 +164,11 @@ def update_school(request, pk):
             school = form.save(False)
             school.user = request.user
             school.save()
-            return HttpResponse(
-                status=204,
-                headers={
-                    'HX-Trigger': json.dumps({
-                        "schoolListChanged": None,
-                        "showMessage": f"{school.school_name} updated successfully."
-                    })
-                })
+
+            messages.success(request, f"{school} updated successfully.")
+            response = HttpResponse(status=204)
+            response['HX-Trigger'] = 'schoolListChanged'
+            return response
 
     return render(request, 'parts/school-form', form=form, modal_header='Update School Attended')
 
@@ -192,14 +178,8 @@ def delete_school(request, pk):
     
     if is_post(request):
         school.delete()
-        return HttpResponse(
-            status=204,
-            headers={
-                'HX-Trigger': json.dumps({
-                "schoolListChanged": None,
-                    "showMessage": f"{school.school_name} deleted."
-                })
-            })
+        messages.success(request, f"{school} deleted.")
+        return HttpResponse(status=204)
 
 
     return render(request, 'parts/delete-school-confirmation', school=school)
@@ -211,18 +191,9 @@ def documents(request):
     if is_post(request):
         form = DocumentForm(request.POST, request.FILES, user=request.user)
         if form.is_valid() and form.save():
-            return HttpResponse(
-                status=204,
-                headers={
-                    'HX-Trigger': json.dumps({
-                        "showMessage": "Registration documents uploaded successfully!!!"
-                    })
-                })
+            messages.success(request, "Registration documents uploaded successfully!!!")
     
-    ctx = {}
-    ctx.update(csrf(request))
-
-    return HttpResponse(render_crispy_form(form))
+    return render_form(request, form)
 
 @applicant_only
 def referees(request):
@@ -236,18 +207,11 @@ def referees(request):
             referee = form.save(False)
             referee.user = request.user
             referee.save()
-            return HttpResponse(
-                status=204,
-                headers={
-                    'HX-Trigger': json.dumps({
-                        "showMessage": "Referee Save successfully."
-                    })
-                })
-    
-    ctx = {}
-    ctx.update(csrf(request))
 
-    return HttpResponse(render_crispy_form(form))
+            messages.success(request, "Referee Save successfully.")
+    
+
+    return render_form(request, form)
 
 @applicant_only
 def scholarships(request):

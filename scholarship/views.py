@@ -3,7 +3,7 @@ from django.urls import reverse
 from app import render
 from app.views import delete_view, create_view, update_view
 from app.auth import officials_only
-from .forms import ScholarshipForm, Scholarship, ScholarshipProgramForm, ScholarshipProgram, Application
+from .forms import ScholarshipForm, Scholarship, ScholarshipProgramForm, ScholarshipProgram
 
 
 # Create your views here.
@@ -44,7 +44,7 @@ def update_scholarship(request, id):
         instance=scholarship,
         header=f'Update {scholarship}',
         form_class=ScholarshipForm, 
-        success_url=reverse('scholarship:index')
+        success_url=reverse('scholarship:scholarship', kwargs={'id': id})
     )
     
 @officials_only(main_admin_only=True)
@@ -70,7 +70,7 @@ def add_scholarship_program(request, id):
         form_kwargs={
             'scholarship': scholarship
         }, 
-        success_url='scholarship:index'
+        success_url=reverse('scholarship:scholarship', kwargs={'id': id})
     )
 
 @officials_only(main_admin_only=True)
@@ -85,17 +85,18 @@ def update_scholarship_program(request, id):
         form_kwargs={
             'scholarship': program.scholarship
         }, 
-        success_url='scholarship:index'
+        success_url=reverse('scholarship:scholarship', kwargs={'id': id})
     )
 
 @officials_only(main_admin_only=True)
 def delete_scholarship_program(request, id):
-    scholarship = get_object_or_404(ScholarshipProgram, id=id)
+    program = get_object_or_404(ScholarshipProgram, id=id)
+    scholarship_id = program.scholarship.id
     
     return delete_view(
         request=request,
-        model=scholarship,
-        success_url='scholarship:index'
+        model=program,
+        success_url=reverse('scholarship:scholarship', kwargs={'id': scholarship_id})
     )
 
 

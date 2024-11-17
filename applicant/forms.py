@@ -54,7 +54,7 @@ class AcademicInformationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
-        self.fields['id_number'].widget.attrs['placeholder'] = 'Enter your ID number here...'
+        self.fields['id_number'].widget.attrs['placeholder'] = 'Enter your ID number'
         self.fields['institution_type'].empty_label = 'Select institution type'
         self.fields['institution'].empty_label = 'Please select institution type'
         self.fields['program'].empty_label = 'Select program'
@@ -68,8 +68,7 @@ class AcademicInformationForm(forms.ModelForm):
         self.helper.layout = Layout(
             Row(
                 Column(
-                    Field(
-                        'institution_type', 
+                    Field('institution_type', 
                         hx_get = reverse('academic:institution-type'),
                         hx_trigger = 'change', hx_target='#id_institution'
                     ), 
@@ -79,8 +78,8 @@ class AcademicInformationForm(forms.ModelForm):
                 css_class='form-row'
             ),
             Row(
-                Column(Field(
-                        'program', 
+                Column(
+                    Field('program', 
                         hx_get = reverse('academic:program'),
                         hx_trigger = 'change', hx_target='#id_current_level'
                     ), 
@@ -91,8 +90,8 @@ class AcademicInformationForm(forms.ModelForm):
                 css_class='form-row'
             ),
             Row(
-                Column(Field(
-                        'course_type', 
+                Column(
+                    Field('course_type', 
                         hx_get = reverse('academic:course-type'),
                         hx_trigger = 'change', hx_target='#id_course_of_study'
                     ), 
@@ -117,25 +116,19 @@ class AccountBankForm(forms.ModelForm):
     
     class Meta:
         model = AccountBank
-        exclude = ('user', )
+        exclude = ('user', 'account_name')
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
-        self.fields['bank'].empty_label = 'Select your bank'
-        self.fields['account_number'].widget.attrs['placeholder'] = 'Enter your account number here...'
-        self.fields['account_name'].widget.attrs['placeholder'] = 'Enter your account name here...'
+        self.fields['bank'].empty_label = 'Select your account bank'
+        self.fields['account_number'].widget.attrs['placeholder'] = 'Enter your account number'
         
         self.helper = FormHelper()
         self.helper.attrs['hx-post'] = reverse('applicant:save-bank-info')
         self.helper.attrs['hx-target'] = 'this'
         self.helper.layout = Layout(
-            Row(
-                Column('bank', css_class='form-group col-md-6 mb-0'),
-                Column('account_number', css_class='form-group col-md-6 mb-0'),
-                css_class='form-row'
-            ),
-            'account_name',
+            'bank', 'account_number',
             Div(
                 Submit('save', 'Save Bank Account'),
                 css_class='text-end'

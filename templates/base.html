@@ -27,7 +27,7 @@
         <aside id="sidebar" class="sidebar-toggle bg-dark">
             <div class="sidebar-logo">
                 <a href="{% url 'main:home' %}">
-                    <i class="fa fa-home"></i>
+                    <img src="{% static 'imgs/logo.png' %}" width="30px" height="auto" alt="BSSB">
                     BSSB Official
                 </a>
             </div>
@@ -64,11 +64,11 @@
                       </a>
                       {% endif %}
   
-                      {% include "./layouts/navbar.html" %}
+                      {% include "layouts/navbar.html" %}
                   </div>
                </nav>
   
-               {% include "./layouts/messages.html" %}
+               {% include "layouts/messages.html" %}
            </header>
 
             <main class='container my-3'>

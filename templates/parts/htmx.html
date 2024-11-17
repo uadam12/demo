@@ -1,34 +1,24 @@
 {% load static %}
 <!-- Empty toast to show the message -->
-<div class="toast-container position-fixed top-0 end-0 p-3">
-    <div id="toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive"
-        aria-atomic="true">
-        <div class="d-flex">
-            <div id="toast-body" class="toast-body"></div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                aria-label="Close"></button>
-        </div>
+<div data-toast-template class="toast align-items-center border-0" role="alert" aria-live="assertive"
+    aria-atomic="true">
+    <div class="d-flex">
+        <div data-toast-body class="toast-body"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+            aria-label="Close"></button>
     </div>
 </div>
+
+<div data-toast-container class="toast-container position-fixed top-0 end-0 p-3"></div>
 
 <div id="request-indicator">
     <img src="{% static 'imgs/loader.svg' %}" alt="">
 </div>
 
+<script src="{% static 'js/htmx.min.js' %}"></script>
 <script src="{% static 'js/htmx.js' %}"></script>
 <script>
     document.body.addEventListener('htmx:configRequest', (e) => {
         e.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
-    });
-
-
-    const requestIndicator = document.getElementById('request-indicator');
-
-    document.addEventListener("htmx:beforeRequest", e => {
-        requestIndicator.classList.add('show');
-    });
-
-    document.addEventListener("htmx:afterRequest", function(e) {
-        requestIndicator.classList.remove('show');
     });
 </script>

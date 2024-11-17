@@ -5,7 +5,7 @@
         <h1>Institution Types</h1>
 
         <a href="{% url 'academic:create-institution-type' %}" class="btn btn-success">
-            <i class="fa fa-plus"></i> Create
+            <i class="bi bi-plus"></i> Create
         </a>
     </div>
 
@@ -22,13 +22,15 @@
                 <td>{{ forloop.counter }}</td>
                 <td>{{ inst_type }}</td>
                 <td>
-                    <a href="{% url 'academic:update-institution-type' id=inst_type.id %}" class="btn btn-warning">
-                        <i class="fa fa-pencil"></i>
-                    </a>
-            
-                    <a href="{% url 'academic:delete-institution-type' id=inst_type.id %}" class="btn btn-danger">
-                        <i class="fa fa-trash"></i>
-                    </a>
+                    <div class="btn-group">
+                        <a href="{% url 'academic:update-institution-type' id=inst_type.id %}" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                
+                        <a href="{% url 'academic:delete-institution-type' id=inst_type.id %}" class="btn btn-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
                 </td>
             </tr>
             {% empty %}

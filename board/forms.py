@@ -31,7 +31,7 @@ class RequirementForm(forms.ModelForm):
         self.helper.layout = Layout(
             'text', 'is_compulsory',
             Div(
-                Submit('save', 'Save Requiremt'), 
+                Submit('save', 'Save Requirement'), 
                 css_class='text-end'
             )
         )
@@ -72,13 +72,10 @@ class LGAForm(forms.ModelForm):
 
         self.helper = FormHelper()
         self.helper.layout = Layout(
-            'name',
-            Div(
-                Submit('save', 'Save Local Government Area'), 
-                css_class='text-end'
-            )
+            'name', 'code',
+            Div(Submit('save', 'Save LGA'), css_class='text-end')
         )
 
     class Meta:
         model = LGA
-        fields = ("name", )
+        fields = ("name", "code")

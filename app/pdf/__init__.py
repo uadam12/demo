@@ -1,5 +1,7 @@
 import os
 from django.conf import settings
+from django.templatetags.static import static
+from django.contrib.staticfiles import finders
 from .helpers import PDFDoc, Header, Row, Text, Grid, Signature
 
 
@@ -10,21 +12,21 @@ def get_image(name):
     )
 
 def generate_application_form(application):
-    #doc = PDFDoc()
     applicant = application.applicant
     info = applicant.personal_info
-    
     
     img:str = applicant.picture.name
     if img.endswith('svg'):
         img = 'no_image.png'
-
+        avater = finders.find('imgs/no_image.png')
+    else: avater = get_image(img)
+    
     doc = PDFDoc()
     doc.add(Header(
-        get_image('logo.png'), 
+        finders.find('imgs/logo.png'), 
         str(application.scholarship),
         application.application_id,
-        get_image(img)
+        avater
     ))
 
     # Personal Information
@@ -90,7 +92,7 @@ def generate_application_form(application):
     
     doc.add_space(60)
     doc.add(Signature(
-        application.applied_on
+        application.applied_on.strftime('%d %B, %Y')
     ))
 
     return doc.generate_pdf()

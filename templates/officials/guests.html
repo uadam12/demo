@@ -5,7 +5,7 @@
         <h1>List of Guest users</h1>
 
         <a href="{% url 'official:create-guest' %}" class="btn btn-success">
-            <i class="fa fa-plus"></i> Create
+            <i class="bi bi-plus"></i> Create
         </a>
     </div>
 
@@ -25,7 +25,7 @@
                 <td>{{ guest.email }}</td>
                 <td>
                     <a href="{% url 'official:delete-guest' id=guest.id %}" class="btn btn-danger">
-                        <i class="fa fa-trash"></i>
+                        <i class="bi bi-trash"></i>
                     </a>
                 </td>
             </tr>

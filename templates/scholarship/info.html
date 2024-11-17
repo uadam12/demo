@@ -1,9 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1 class="text-center text-primary">
-        {{ scholarship }}
-    </h1>
+    <h1 class="text-center text-primary">{{ scholarship.title }}</h1>
+    <p>{{ scholarship.description }}</p>
 
     <h3>Criteria:</h3>
     <ul>
@@ -26,10 +25,10 @@
             <p>{{ program }}</p>
             <p class="me-3">
                 <a href="{% url 'scholarship:update-program' id=program.id %}" class="btn btn-warning">
-                    <i class="fa fa-pencil"></i>
+                    <i class="bi bi-pencil"></i>
                 </a>
                 <a href="{% url 'scholarship:delete-program' id=program.id %}" class="btn btn-danger">
-                    <i class="fa fa-trash"></i>
+                    <i class="bi bi-trash"></i>
                 </a>
             </p>
         </li>
@@ -41,19 +40,19 @@
 
     <div class="btn-group">
         <a href="{% url 'scholarship:update' id=scholarship.id %}" class="btn btn-outline-primary">
-            Update <i class="fa fa-pencil"></i>
+            Update <i class="bi bi-pencil"></i>
         </a>
+
         <a href="{% url 'scholarship:add-program' id=scholarship.id %}" class="btn btn-outline-primary">
-            Program <i class="fa fa-plus"></i>
+            Program <i class="bi bi-plus"></i>
         </a>
 
         <a href="{% url 'scholarship:scholarship-applications' id=scholarship.id %}" class="btn btn-outline-primary">
-            Applications <i class="fa fa-file"></i>
+            Applications <i class="bi bi-files"></i>
         </a>
 
         <a href="{% url 'scholarship:scholarship-disbursement' id=scholarship.id %}" class="btn btn-outline-primary">
-            Disbursement <i class="fa fa-money"></i>
+            Disbursement <i class="bi bi-currency-dollar"></i>
         </a>
     </div>
-
 {% endblock %}
