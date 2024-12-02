@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth import get_user_model
+from .models import User, Document
 from .forms import UserAddForm, UserEditForm
 
 
@@ -8,7 +8,7 @@ from .forms import UserAddForm, UserEditForm
 class BSSBUserAdmin(UserAdmin):
     add_form = UserAddForm
     form = UserEditForm
-    model = get_user_model()
+    model = User
     list_display = ('email', 'is_staff', 'is_active')
     list_filter = ('email', 'is_staff', 'is_active')
     fieldsets = (
@@ -27,4 +27,5 @@ class BSSBUserAdmin(UserAdmin):
     search_fields = ('email', )
     ordering = ('email', )
 
-admin.site.register(get_user_model(), BSSBUserAdmin)
+admin.site.register(User, BSSBUserAdmin)
+admin.site.register(Document)

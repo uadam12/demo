@@ -1,97 +1,124 @@
 import django_filters as df
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, Div, Submit
+from django import forms
+from crispy_forms.layout import Layout
+from app.filter import FilterDataSet
 from .models import Course, CourseType, Program, Level, Institution, InstitutionType
 
-class InstitutionFilter(df.FilterSet):
+
+class SearchFilter(FilterDataSet):
+    name = df.CharFilter(
+        'name', lookup_expr='icontains', 
+        label='', widget = forms.TextInput(attrs={
+            'placeholder': 'Search by Name'
+        })
+    )
+
+    @property
+    def form(self):
+        form = super().form
+        form.helper.layout = Layout(self.search_field_with_btn('name'))
+        return form
+
+class InstitutionTypeFilter(SearchFilter):
+    class Mete:
+        model = InstitutionType
+        fields = ['name']
+
+class CourseTypeFilter(SearchFilter):
+    name = df.CharFilter(
+        'title', lookup_expr='icontains', 
+        label='', widget = forms.TextInput(attrs={
+            'placeholder': 'Search by Name'
+        })
+    )
+
+    class Mete:
+        model = CourseType
+        fields = []
+
+class ProgramFilter(SearchFilter):
+    class Mete:
+        model = Program
+        fields = ['name']
+
+
+class InstitutionFilter(FilterDataSet):
     class Mete:
         model = Institution
-        fields = []
+        fields = ('institution_type', 'name')
 
-    institution_type = df.ModelChoiceFilter(
+    name = df.CharFilter(
+        'name', lookup_expr='icontains', 
+        label='', widget = forms.TextInput(attrs={
+            'placeholder': 'Search Institution'
+        })
+    )
+    institution_type = df.ModelMultipleChoiceFilter(
         field_name = 'institution_type',
-        label = 'Institution Type',
-        empty_label = 'Select Institution Type',
         queryset = InstitutionType.objects.all(),
+        label = '', widget = forms.CheckboxSelectMultiple(attrs={
+            'placeholder': 'Search Institution'
+        })
     )
     
     @property
     def form(self):
         form = super().form
-        form.helper = FormHelper()
-        form.helper.form_method = 'get'
         form.helper.layout = Layout(
-            Row(
-                Column('institution_type', css_class='form-group col-md-9'),
-                Column(
-                    Div(
-                        Submit('', "Filter Institutions"), css_class='text-end',
-                    ),
-                    css_class='form-group col-md-3 mb-0 align-self-end pb-3'
-                )
-            )
+            'institution_type', 
+            self.search_field_with_btn('name')
         )
         
         return form
     
-class LevelFilter(df.FilterSet):
+class LevelFilter(FilterDataSet):
     class Mete:
         model = Level
-        fields = []
+        fields = ['name']
+    
+    name = df.CharFilter(
+        'name', lookup_expr='icontains', 
+        label='', widget = forms.TextInput(attrs={
+            'placeholder': 'Search Institution'
+        })
+    )
 
-    program = df.ModelChoiceFilter(
+    program = df.ModelMultipleChoiceFilter(
         field_name = 'program',
-        label = 'Academic Program',
-        empty_label = 'Select Program',
         queryset = Program.objects.all(),
+        label = '', widget = forms.CheckboxSelectMultiple(attrs={
+            'placeholder': 'Search Program'
+        })
     )
     
     @property
     def form(self):
         form = super().form
-        form.helper = FormHelper()
-        form.helper.form_method = 'get'
         form.helper.layout = Layout(
-            Row(
-                Column('program', css_class='form-group col-md-9'),
-                Column(
-                    Div(
-                        Submit('', "Filter Levelss"), css_class='text-end',
-                    ),
-                    css_class='form-group col-md-3 mb-0 align-self-end pb-3'
-                )
-            )
+            'program', 
+            self.search_field_with_btn('name')
         )
         
         return form
 
-class CourseFilter(df.FilterSet):
+class CourseFilter(CourseTypeFilter):
     class Mete:
         model = Course
         fields = []
 
-    course_type = df.ModelChoiceFilter(
+    course_type = df.ModelMultipleChoiceFilter(
         field_name = 'course_type',
-        label = 'Field of study',
-        empty_label = 'Select Course Type',
         queryset = CourseType.objects.all(),
+        label = '', widget = forms.CheckboxSelectMultiple(attrs={
+            'placeholder': 'Search Institution'
+        })
     )
     
     @property
     def form(self):
         form = super().form
-        form.helper = FormHelper()
-        form.helper.form_method = 'get'
         form.helper.layout = Layout(
-            Row(
-                Column('course_type', css_class='form-group col-md-9'),
-                Column(
-                    Div(
-                        Submit('', "Filter Courses"), css_class='text-end',
-                    ),
-                    css_class='form-group col-md-3 mb-0 align-self-end pb-3'
-                )
-            )
+            'course_type', self.search_field_with_btn('name')
         )
         
         return form

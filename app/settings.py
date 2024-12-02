@@ -40,9 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_filters', 'crispy_forms', 'crispy_bootstrap5',
-    'board', 'main', 'users', 'academic',  
-    'scholarship', 'applicant',
-    'registration', 'payment'
+    'board', 'payment', 'users', 'main',
+    'academic', 'scholarship', 'applicant',
 ]
 
 MIDDLEWARE = [
@@ -70,6 +69,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'app.context_processors.notifications'
             ],
         },
     },

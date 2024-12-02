@@ -2,38 +2,41 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.urls import reverse
 from app import render, is_post
-from app.auth import login_required, applicant_only, officials_only
-from registration.models import Registration
-from scholarship.models import Scholarship
-from .models import Payment, ApplicationFEE
+from app.views import data_view
+from app.auth import login_required, officials_only, complete_profile_required
+from board.models import Board
+from scholarship.models import Scholarship, Application
 from .filters import PaymentFilter
 from .payment import payment
+from .models import Payment
+
 
 # Create your views here.
 @officials_only()
 def index(request):
     filter = PaymentFilter(request.GET, queryset=Payment.objects.all())
-    
-    return render(
-        request, 'payment/index', 'BSSB Payment Details',
-        payments = filter.qs,
-        form = filter.form
+
+    return data_view(
+        request, data= filter.qs,
+        data_template='payment/index.html', 
+        table_headers=['S/N', 'Amount', 'Paid On', 'RRR', 'Verified?'],
+        filter_form = filter.form, title='Payments',
     )
 
 @login_required
 def registration_fee(request):
-    amount = float(Registration.load().fee)
+    amount = float(Board().registration_fee)
 
     if is_post(request):
         verification_url = reverse('payment:verify-reg-fee-payment')
         verification_url = request.build_absolute_uri(verification_url)
         url = payment.url(amount, request.user, verification_url)
-        print(url, verification_url)
+
         return redirect(url)
 
     return render(
         request, 'payment/registration-fee',
-        title='Pay Registration Fee',
+        title = 'Registration FEE Payment',
         amount = amount
     )
 
@@ -43,17 +46,15 @@ def verify_reg_fee_payment(request):
     rrr = request.GET.get('reference', None)
     
     if rrr is not None:
-        amount = float(Registration.load().fee)
+        amount = Board().registration_fee
         payment_verified = payment.verify(ref=rrr, amount=amount)
 
         if payment_verified:
-            Payment.objects.get_or_create(
-                amount=amount,
-                code = 1,
-                rrr=rrr,
-                payer=request.user
+            payment_obj, _ = Payment.objects.get_or_create(
+                amount=amount, payment_type = 1, rrr=rrr
             )
-            request.user.paid_registration_fee = True
+            
+            request.user.registration_fee_payment = payment_obj
             request.user.save()
 
             messages.success(request, 'Registration FEE paid successfully!!!')
@@ -62,13 +63,14 @@ def verify_reg_fee_payment(request):
 
     return render(request, 'payment/verify-payment', title='BSSB Verify Payment')
 
-@applicant_only
+@complete_profile_required
 def application_fee(request, id):
     scholarship = get_object_or_404(Scholarship, id=id)
     amount = float(scholarship.application_fee)
 
     if is_post(request):
-        verification_url = reverse('payment:verify-app-fee-payment', kwargs={'id':id})
+        application = Application.get_or_create(request.user, scholarship)
+        verification_url = reverse('payment:verify-app-fee-payment', kwargs={'id':application.id})
         verification_url = request.build_absolute_uri(verification_url)
         url = payment.url(amount, request.user, verification_url)
         return redirect(url)
@@ -79,30 +81,28 @@ def application_fee(request, id):
         scholarship = scholarship,
     )
     
-@applicant_only
+@complete_profile_required
 def verify_application_fee(request, id):
-    scholarship = get_object_or_404(Scholarship, id=id)
+    application:Application = get_object_or_404(Application, id=id)
     
     rrr = request.GET.get('reference', None)
     
     if rrr is not None:
-        amount = float(scholarship.application_fee)
+        scholarship:Scholarship = application.scholarship
+        amount = scholarship.application_fee
         payment_verified = payment.verify(ref=rrr, amount=amount)
 
         if payment_verified:
             payment_obj, _ = Payment.objects.get_or_create(
                 amount=amount,
-                code = 2,
-                rrr=rrr,
-                payer=request.user
+                payment_type = 2,
+                rrr=rrr
             )
-            ApplicationFEE.objects.get_or_create(
-                payment = payment_obj,
-                applicant = request.user,
-                scholarship = scholarship,
-            )
+            application.application_fee_payment = payment_obj
+            application.save()
+
             messages.success(request, 'Application FEE paid successfully!!!')
             messages.info(request, 'Please review your profile details and then upload the required documents.')
-            return redirect('applicant:apply', id=id)
+            return redirect('applicant:apply', id=scholarship.id)
 
     return render(request, 'payment/verify-payment', title='BSSB Verify Payment')

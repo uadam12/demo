@@ -1,30 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card my-5 mx-auto" style="max-width: 500px;">
+<div class="card mt-5 mx-auto" style="max-width: 600px;">
     <div class="card-header">
-        <h3 class="card-title text-secondary text-center">
-            Delete {{ model }} confirmation
-        </h3>
+        <h3 class="card-title text-secondary text-center">{{ title }}</h3>
     </div>
 
     <div class="card-body">
-        <p class="text-danger">
-            Are you sure you want to delete {{ model }}. <br>
-            <i class="bi bi-info-circle"></i> 
-            Note: This action permanent thereby cannot be reversed.
+        <p>
+            <span class="text-danger">Are you sure you want to delete {{ model }}.</span><br>
+            <i class="bi bi-info-circle text-danger"></i> 
+            <span class="text-muted"><b>Note:</b> This action permanent and cannot be reversed.</span>
         </p>
     </div>
 
-    <form method="post" class="card-footer text-end">
-        {% csrf_token %}
-        <a href="{{ back_url }}" class="btn btn-success">
-            <i class="bi bi-arrow-left"></i> Cancel
-        </a>
-
-        <button class="btn btn-danger">
-            <i class="bi bi-trash"></i> Delete
-        </button>
-    </form>
+    <div class="card-footer">
+        <form method="post" class="text-end">
+            {% csrf_token %}
+            <a href="{{ model.list_url }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Cancel
+            </a>
+    
+            <button class="btn btn-danger">
+                <i class="bi bi-trash"></i> Delete
+            </button>
+        </form>
+    </div>
 </div>
 {% endblock %}

@@ -26,8 +26,8 @@
         <!-- Sidebar -->
         <aside id="sidebar" class="sidebar-toggle bg-dark">
             <div class="sidebar-logo">
-                <a href="{% url 'main:home' %}">
-                    <img src="{% static 'imgs/logo.png' %}" width="30px" height="auto" alt="BSSB">
+                <a href="{% url 'official:dashboard' %}">
+                    <i class="bi bi-speedometer2"></i>
                     BSSB Official
                 </a>
             </div>
@@ -50,26 +50,31 @@
 
         <!-- Main Component -->
         <div class="main">
-        {% endif %}
+            {% endif %}
             <header>
-              <nav class="navbar navbar-expand-md navbar-dark bg-success">
-                  <div class="container-fluid">
-                      {% if user.access_code > 1 %}
-                      <button class="toggler-btn" type="button">
-                          <i class="navbar-toggler-icon"></i>
-                      </button>
-                      {% else %}
-                      <a class="navbar-brand" href="{% url 'main:home' %}">
-                          <img src="{% static 'imgs/logo.png' %}" alt="" width="70" height="50"> BSSB
-                      </a>
-                      {% endif %}
-  
-                      {% include "layouts/navbar.html" %}
-                  </div>
-               </nav>
-  
-               {% include "layouts/messages.html" %}
-           </header>
+                <nav class="navbar navbar-expand-md navbar-dark bg-success">
+                    <div class="container-fluid">
+                        {% if user.access_code > 1 %}
+                        <div>
+                            <button class="toggler-btn" type="button">
+                                <i class="navbar-toggler-icon"></i>
+                            </button>
+                            <a href="{% url 'main:home' %}">
+                                <img src="{% static 'imgs/logo.png' %}" width="30px" height="auto" alt="BSSB">
+                            </a>
+                        </div>
+                        {% else %}
+                        <a class="navbar-brand" href="{% url 'main:home' %}">
+                            <img src="{% static 'imgs/logo.png' %}" alt="" width="70" height="50">
+                        </a>
+                        {% endif %}
+
+                        {% include "layouts/navbar.html" %}
+                    </div>
+                </nav>
+
+                {% include "layouts/messages.html" %}
+            </header>
 
             <main class='container my-3'>
                 {% block content %} {% endblock content %}
@@ -80,12 +85,12 @@
                     <img src="{% static 'imgs/loader.svg' %}" alt="...">
                 </div>
             </div>
-    
+
             {% include "layouts/footer.html" %}
-        {% if user.access_code > 1 %}
+            {% if user.access_code > 1 %}
         </div>
     </div>
-    
+
     <script>
         const toggler = document.querySelector(".toggler-btn");
         const sidebar = document.querySelector("#sidebar");
@@ -95,12 +100,14 @@
         });
     </script>
     {% endif %}
-    
+
     <script src="{% static 'bs/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
 
     {% if with_htmx %} {% include "parts/htmx.html" %} {% endif %}
-    
+    {% if with_modal %} {% include "parts/modal.html" %} {% endif %}
+
     {% block body_end %} {% endblock body_end %}
 </body>
+
 </html>

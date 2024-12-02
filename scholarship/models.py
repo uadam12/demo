@@ -1,23 +1,37 @@
 import random, string
 from datetime import datetime
 from django.db import models
+from django.urls import reverse
 from django.core.exceptions import ValidationError
-from board.models import Criterion, Requirement, Bank
+from board.models import Bank
 from academic.models import Program, Institution, Level, Course
+from applicant.models import SchoolAttended
+from payment.models import Payment
 from users.models import User
-
 
 
 # Create your models here.
 class Scholarship(models.Model):
+    title = models.CharField(max_length=255)
     description = models.TextField()
-    title = models.CharField(max_length=150)
+    status = models.BooleanField(default=True)
+    application_fee = models.DecimalField(max_digits=6, decimal_places=2)
+    program = models.ForeignKey(Program, on_delete=models.RESTRICT, related_name='scholarships')
+    disbursement_amount = models.DecimalField(max_digits=10, decimal_places=2, default=50_000.00)
     application_commence = models.DateTimeField()
     application_deadline = models.DateTimeField()
-    application_fee = models.DecimalField(max_digits=6, decimal_places=2)
-    criteria = models.ManyToManyField(Criterion, related_name='public_scholarships')
-    requirements = models.ManyToManyField(Requirement, related_name='public_scholarships')
+    eligibility_criteria = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
+    @property
+    def applications(self):
+        return Application.objects.filter(scholarship=self)
+    
+    @property
+    def criteria(self):
+        criteria:str = self.eligibility_criteria
+        return criteria.split('\n') if criteria else []
     
     def clean(self) -> None:
         if self.application_commence >= self.application_deadline:
@@ -53,76 +67,36 @@ class Scholarship(models.Model):
             application_deadline__gt = datetime.now()
         )
 
-class ScholarshipProgram(models.Model):
-    disbursement_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    program = models.ForeignKey(
-        Program, 
-        on_delete=models.CASCADE, 
-        related_name='internal_scholarships'
-    )
-    scholarship = models.ForeignKey(
-        Scholarship, 
-        on_delete=models.CASCADE, 
-        related_name='programs'
-    )
-    
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['program', 'scholarship'], name='unique program per scholarship'
-            )
-        ]
-        
-    def clean(self, *args, **kwargs):
-        program_exists = ScholarshipProgram.objects.filter(
-            scholarship_id=self.scholarship_id, 
-            program_id=self.program_id
-        ).exclude(id=self.id).exists()
-        
-        if program_exists: raise ValidationError({
-            'program': f"{self.program} already exists for {self.scholarship}"
-        })
-    
-        return super().clean(*args, **kwargs)
-    
-    def save(self, *args, **kwargs):
-        self.clean()
-        return super().save(*args, **kwargs)
+class ApplicationDocument(models.Model):
+    name = models.CharField(max_length=255)
+    required = models.BooleanField(default=True)
+    scholarship = models.ForeignKey(Scholarship, on_delete=models.CASCADE, related_name='app_documents')
 
-    def __str__(self) -> str:
-        return str(self.program)
-    
-
-# Application
-class Application(models.Model):
     @property
-    def declerations(self):
-        return [
-            f"I <b><u>{self.applicant.first_name}</u></b> hereby declare that the information provided above is to the best of my knowledge and belief accurate in every details.",
-            'If given this scholarship, I will also comply strictly with the Rules and Regulations of the Borno State Scholarship Board.'
-        ]
-
-    schools_attended = [
-        ('School Name', 'Qualification Obtained', 'From Date', 'To Date'),
-        ('Kamsulem Junior Day Secondary School', 'JSCE', '2013', '2015'),
-        ('Government Colledge Maiduguri Borno State', 'SSCE', '2016', '2029')
-    ]
+    def update_url(self):
+        return reverse('scholarship:update-app-document', kwargs={'id':self.pk})
     
+    @property
+    def delete_url(self):
+        return reverse('scholarship:delete-app-document', kwargs={'id':self.pk})
+    
+    def __str__(self) -> str:
+        return self.name
+
+class Application(models.Model):
     STATUS = (
-        ('Pending', 'Pending'), 
-        ('Approved', 'Approved'),
-        ('Rejected', 'Rejected'),
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('incomplete', 'Incomplete'),
     )
-    DISBURSEMENT_STATUS = (
-        ('Paid', 'Paid'),
-        ('Unpaid', 'Unpaid')
-    )
-    scholarship = models.ForeignKey(Scholarship, on_delete=models.CASCADE, related_name='applications')
-    applicant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='applications')
-    status = models.CharField(max_length=15, choices=STATUS, default='Pending')
-    disbursement_status = models.CharField(max_length=15, choices=DISBURSEMENT_STATUS, default='Unpaid')
+    
     application_id = models.CharField(max_length=20)
-    applied_on = models.DateTimeField(auto_now_add=True)
+    applicant = models.ForeignKey(User, on_delete=models.CASCADE)
+    scholarship = models.ForeignKey(Scholarship, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=STATUS, default='incomplete')
+    application_fee_payment = models.ForeignKey(Payment,null=True, on_delete=models.CASCADE)
+    submitted_at = models.DateTimeField(auto_now_add=True)
     
     instituion = models.ForeignKey(Institution, on_delete=models.RESTRICT, related_name='applications')
     program = models.ForeignKey(Program, on_delete=models.RESTRICT, related_name='applications')
@@ -139,6 +113,33 @@ class Application(models.Model):
     referee_name = models.CharField(max_length=50)
     referee_phone_number = models.CharField(max_length=10)
     referee_occupation = models.CharField(max_length=50)
+
+    @property
+    def url(self):
+        return reverse('scholarship:application', kwargs={'application_id':self.application_id})
+    
+    @property
+    def approve_url(self):
+        return reverse('scholarship:approve-application', kwargs={'id':self.id})
+    
+    @property
+    def reject_url(self):
+        return reverse('scholarship:reject-application', kwargs={'id':self.id})
+
+    @property
+    def declerations(self):
+        return [
+            f"I <b><u>{self.applicant.first_name}</u></b> hereby declare that the information provided above is to the best of my knowledge and belief accurate in every details.",
+            'If given this scholarship, I will also comply strictly with the Rules and Regulations of the Borno State Scholarship Board.'
+        ]
+    
+    @property
+    def schools_attended(self):
+        schools = SchoolAttended.objects.filter(user=self.applicant).order_by('-id')[:5]
+        schools = [school.info for school in schools]
+        schools.insert(0, ('School Name', 'Qualification Obtained', 'From Date', 'To Date'))
+
+        return schools
 
     @classmethod
     def get_or_create(cls, applicant, scholarship):
@@ -186,27 +187,12 @@ class Application(models.Model):
             
         return super().save(*args, **kwargs)
     def __str__(self) -> str:
-        return f"Application of {self.applicant} for {self.scholarship}"
+        return f"Application by {self.applicant} for {self.scholarship.title}"
 
-class ApplicationDocument(models.Model):
+class Document(models.Model):
     image = models.ImageField(upload_to='application_documents', null=True, blank=True)
-    application = models.ForeignKey(
-        Application, 
-        on_delete=models.CASCADE, 
-        related_name='documents'
-    )
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='documents')
+    app_document = models.ForeignKey(ApplicationDocument, on_delete=models.CASCADE, related_name='documents')
 
-    requirement = models.ForeignKey(
-        Requirement, 
-        on_delete=models.CASCADE, 
-        related_name='application_documents'
-    )
-    
-    def clean(self) -> None:
-        if self.requirement.is_compulsary and not self.image:
-            raise ValidationError(f"You need to upload your {self.requirement.text}")
-
-        return super().clean()
-    
     def __str__(self) -> str:
-        return f"{self.requirement.text} of {self.application.applicant}"
+        return f"{self.app_document} of {self.application.applicant}"

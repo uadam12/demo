@@ -1,5 +1,9 @@
 from django.db import models
+from django.urls import reverse
+from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
+from board.models import RegistrationDocument
+from payment.models import Payment
 from .managers import BSSBManager, _
 
 
@@ -8,7 +12,7 @@ class User(AbstractUser):
     ACCESS_CODES = (
         (1, 'Applicant'),
         (2, 'Guest User'),
-        (3, 'Admin'),
+        (3, 'Administrator'),
         (4, 'Main Admin')
     )
     username = None
@@ -17,11 +21,10 @@ class User(AbstractUser):
     is_blocked = models.BooleanField(default=False)
     has_completed_profile = models.BooleanField(default=False)
     paid_registration_fee = models.BooleanField(default=False)
-    
-    picture = models.ImageField(
-        default='/default-user.svg', 
-        upload_to='profiles'
-    )
+    picture = models.ImageField(default='/static/default-user.svg', upload_to='profiles')
+    last_time_read_notifications = models.DateTimeField(default=timezone.now, blank=True)
+    registration_fee_payment = models.OneToOneField(Payment, default=None, null=True, on_delete=models.SET_DEFAULT, related_name='applicant')
+
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -29,24 +32,53 @@ class User(AbstractUser):
     objects = BSSBManager()
     
     @property
-    def dashboard(self):
-        return 'applicant:dashboard' if self.access_code < 2 else 'official:dashboard'
+    def registration_documents(self):
+        reg_docs = RegistrationDocument.objects.all()
+        
+        for reg_doc in reg_docs:
+            Document.objects.get_or_create(owner=self, reg=reg_doc)
+            
+        
+        return Document.objects.filter(owner=self)
 
-    @classmethod
-    def admins(cls):
-        return cls.objects.filter(access_code=3)
+    @property
+    def profile_error_messages(self) -> list:
+        profile_errors = []
+        error_messages = {
+            #'personal_info': 'Please update your personal information.',
+            'academic_info': 'Please add your current academic information.',
+            'account_bank': 'Please add your account bank details.',
+            'schools_attended': 'Please add school(s) you attended before.',
+            'referee': 'Please provide us with your referee details.'
+        }
+        
+        if self.picture.url.endswith('.svg'):
+            profile_errors.append('Please update your profile picture.')
+        
+        for field, message in error_messages.items():
+            if not hasattr(self, field):
+                profile_errors.append(message)
+                
+        return profile_errors
+
+    @property
+    def dashboard(self):
+        viewname = 'applicant:dashboard' if self.access_code < 2 else 'official:dashboard'
+        return reverse(viewname)
     
-    @classmethod
-    def guests(cls):
-        return cls.objects.filter(access_code=2)
- 
-    @classmethod
-    def applicants(cls):
-        return cls.objects.filter(access_code=1) | cls.blocked_users()
-    
-    @classmethod
-    def blocked_users(cls):
-        return cls.objects.filter(access_code=0)
+    @property
+    def profile(self):
+        viewname = 'applicant:profile' if self.access_code < 2 else 'official:profile'
+        return reverse(viewname)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+
+class Document(models.Model):
+    image = models.ImageField(upload_to='registration_documents', null=True, blank=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documents')
+    reg = models.ForeignKey(RegistrationDocument, on_delete=models.CASCADE, related_name='documents')
+
+    def __str__(self) -> str:
+        return f"{self.reg.name} of {self.owner}"

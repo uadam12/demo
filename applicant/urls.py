@@ -14,9 +14,9 @@ urlpatterns = [
     path('scholarships/', views.scholarships, name='scholarships'),
     path('apply/<int:id>/', views.apply, name='apply'),
     
-    path('schools_attended/', views.schools_attended, name='schools-attended'),
-    path('schools_attended/add/', views.add_school, name='add-school'),
-    path('schools_attended/<int:pk>/update/', views.update_school, name='update-school'),
-    path('schools_attended/<int:pk>/delete/', views.delete_school, name='delete-school'),
+    path('schools-attended/', views.schools_attended, name='schools-attended'),
+    path('schools-attended/add/', views.add_school, name='add-school'),
+    path('schools-attended/<int:pk>/update/', views.update_school, name='update-school'),
+    path('schools-attended/<int:pk>/delete/', views.delete_school, name='delete-school'),
     path('change-profile-picture', views.change_profile_picture, name='change-profile-picture')
 ]

@@ -3,26 +3,57 @@
     <li class="sidebar-item">
         <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
             data-bs-target="#board" aria-expanded="true" aria-controls="board">
-            <span>Board</span>
+            <span>
+                <i class="bi bi-gear"></i> Board
+            </span>
         </a>
         <ul id="board" class="sidebar-dropdown list-unstyled collapse ms-3" data-bs-parent="#sidebar">
             <li class="sidebar-item">
-                <a class="sidebar-link" href="{% url 'board:banks' %}">Banks</a>
+                <a class="sidebar-link" href="{% url 'board:index' %}"><i class="bi bi-link"></i> Board</a>
             </li>
+
             <li class="sidebar-item">
-                <a class="sidebar-link" href="{% url 'board:lgas' %}">Local Government Areas</a>
+                <a class="sidebar-link" href="{% url 'board:reg-documents' %}"><i class="bi bi-link"></i> Reg documents</a>
             </li>
+
             <li class="sidebar-item">
-                <a class="sidebar-link" href="{% url 'board:criteria' %}">Criteria</a>
+                <a class="sidebar-link" href="{% url 'board:banks' %}"><i class="bi bi-link"></i> Banks</a>
             </li>
+
             <li class="sidebar-item">
-                <a class="sidebar-link" href="{% url 'board:requirements' %}">Requirements</a>
+                <a class="sidebar-link" href="{% url 'board:accounts' %}"><i class="bi bi-link"></i> Accounts</a>
             </li>
+
             <li class="sidebar-item">
-                <a class="sidebar-link" href="{% url 'registration:index' %}">Registration</a>
+                <a class="sidebar-link" href="{% url 'board:lgas' %}"><i class="bi bi-link"></i> LGAs</a>
             </li>
+        </ul>
+    </li>
+
+    <!-- Media -->
+    <li class="sidebar-item">
+        <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
+            data-bs-target="#media" aria-expanded="true" aria-controls="board">
+            <span>
+                <i class="bi bi-chat-quote"></i> Media
+            </span>
+        </a>
+
+        <ul id="media" class="sidebar-dropdown list-unstyled collapse ms-3" data-bs-parent="#sidebar">
             <li class="sidebar-item">
-                <a class="sidebar-link" href="{% url 'main:articles' %}">Articles</a>
+                <a class="sidebar-link" href="{% url 'main:articles' %}"><i class="bi bi-link"></i> Articles</a>
+            </li>
+
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="{% url 'main:contacts' %}"><i class="bi bi-link"></i> Contacts</a>
+            </li>
+
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="{% url 'main:notifications' %}"><i class="bi bi-link"></i> Notifications</a>
+            </li>
+
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="{% url 'main:faqs' %}"><i class="bi bi-link"></i> FAQs</a>
             </li>
         </ul>
     </li>
@@ -31,26 +62,28 @@
     <li class="sidebar-item">
         <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
             data-bs-target="#academic" aria-expanded="true" aria-controls="academic">
-            <span>Academic</span>
+            <span>
+                <i class="bi bi-mortarboard"></i> Academic
+            </span>
         </a>
         <ul id="academic" class="sidebar-dropdown list-unstyled collapse ms-3" data-bs-parent="#sidebar">
             <li class="sidebar-item">
-                <a href="{% url 'academic:programs' %}" class="sidebar-link">Programs</a>
+                <a href="{% url 'academic:programs' %}" class="sidebar-link"><i class="bi bi-link"></i> Programs</a>
             </li>
             <li class="sidebar-item">
-                <a href="{% url 'academic:levels' %}" class="sidebar-link">Levels</a>
+                <a href="{% url 'academic:levels' %}" class="sidebar-link"><i class="bi bi-link"></i> Levels</a>
             </li>
             <li class="sidebar-item">
-                <a href="{% url 'academic:course-types' %}" class="sidebar-link">Course Types</a>
+                <a href="{% url 'academic:course-types' %}" class="sidebar-link"><i class="bi bi-link"></i> Course Types</a>
             </li>
             <li class="sidebar-item">
-                <a href="{% url 'academic:courses' %}" class="sidebar-link">Courses</a>
+                <a href="{% url 'academic:courses' %}" class="sidebar-link"><i class="bi bi-link"></i> Courses</a>
             </li>
             <li class="sidebar-item">
-                <a href="{% url 'academic:institution-types' %}" class="sidebar-link">Institution Types</a>
+                <a href="{% url 'academic:institution-types' %}" class="sidebar-link"><i class="bi bi-link"></i> Institution Types</a>
             </li>
             <li class="sidebar-item">
-                <a href="{% url 'academic:institutions' %}" class="sidebar-link">Institutions</a>
+                <a href="{% url 'academic:institutions' %}" class="sidebar-link"><i class="bi bi-link"></i> Institutions</a>
             </li>
         </ul>
     </li>
@@ -59,51 +92,27 @@
     <li class="sidebar-item">
         <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
             data-bs-target="#users" aria-expanded="true" aria-controls="users">
-            <span>Users</span>
+            <span>
+                <i class="bi bi-people"></i> Users
+            </span>
         </a>
         <ul id="users" class="sidebar-dropdown list-unstyled collapse ms-3" data-bs-parent="#sidebar">
             <li class="sidebar-item">
-                <a href="{% url 'official:admins' %}" class="sidebar-link">Admins</a>
+                <a href="{% url 'official:index' %}" class="sidebar-link"><i class="bi bi-link"></i> Officials</a>
             </li>
             <li class="sidebar-item">
-                <a href="{% url 'official:guests' %}" class="sidebar-link">Guests</a>
-            </li>
-            <li class="sidebar-item">
-                <a href="{% url 'official:applicants' %}" class="sidebar-link">Applicants</a>
+                <a href="{% url 'official:applicants' %}" class="sidebar-link"><i class="bi bi-link"></i> Applicants</a>
             </li>
         </ul>
     </li>
 
     <!-- Scholarships -->
     <li class="sidebar-item">
-        <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
-            data-bs-target="#scholarships" aria-expanded="true" aria-controls="scholarships">
-            <span>Scholarships</span>
-        </a>
-
-        <ul id="scholarships" class="sidebar-dropdown list-unstyled collapse ms-3" data-bs-parent="#sidebar">
-            <li class="sidebar-item">
-                <a href="{% url 'scholarship:index' %}" class="sidebar-link">Scholarships</a>
-            </li>
-            <li class="sidebar-item">
-                <a href="{% url 'scholarship:internals' %}" class="sidebar-link">Internals</a>
-            </li>
-            <li class="sidebar-item">
-                <a href="{% url 'scholarship:externals' %}" class="sidebar-link">Externals</a>
-            </li>
-        </ul>
+        <a href="{% url 'scholarship:index' %}" class="sidebar-link"><i class="bi bi-award"></i> Scholarships</a>
     </li>
 
     <!-- Payments -->
     <li class="sidebar-item">
-        <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
-            data-bs-target="#payments" aria-expanded="true" aria-controls="payments">
-            <span>Payments</span>
-        </a>
-        <ul id="payments" class="sidebar-dropdown list-unstyled collapse ms-3" data-bs-parent="#sidebar">
-            <li class="sidebar-item">
-                <a href="{% url 'payment:index' %}" class="sidebar-link">Payments</a>
-            </li>
-        </ul>
+        <a href="{% url 'payment:index' %}" class="sidebar-link"><i class="bi bi-cash"></i> Payments</a>
     </li>
 </ul>

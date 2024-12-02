@@ -18,24 +18,7 @@
                 <th>Actions</th>
             </tr>
             
-            {% for admin in admins %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ admin }}</td>
-                <td>{{ admin.email }}</td>
-                <td>
-                    <a href="{% url 'official:delete-admin' id=admin.id %}" class="btn btn-danger">
-                        <i class="bi bi-trash"></i>
-                    </a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4" class="text-center text-muted">
-                    There is no available admin
-                </td>
-            </tr>
-            {% endfor %}
+            
         </table>
     </div>
 {% endblock %}

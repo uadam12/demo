@@ -1,14 +1,14 @@
 from django.core.management.base import BaseCommand
-from ..data.institutions import inst_types
+from ..data.institutions import institutions_by_type
 from ..data.programs import programs
 from ..data.banks import banks
 from ..data.lgas import lgas
+from ..data.faqs import faqs
 from ..data.articles import articles
-from ..data.criteria import criteria, requirements
 from ..data.field_of_study import field_of_study
 
-from board.models import Bank, LGA, Requirement, Criterion
-from main.models import Article
+from board.models import Bank, LGA
+from main.models import Article, FAQ
 from academic.models import (
     InstitutionType, Institution,
     CourseType, Course, 
@@ -19,24 +19,16 @@ from academic.models import (
 class Command(BaseCommand):
     help = 'Populate data base with some data'
     
-    def handle(self, *args, **options):
+    def handle(self, *_, **__):
         # Articles
-        available_articles = Article.objects.all()
-        available_headlines = [article.headline for article in available_articles]
-        article_models = [Article(**article) for article in articles if not article['headline'] in available_headlines]
+        questions = [q.question for q in FAQ.objects.all()]
+        faq_models = [FAQ(**faq) for faq in faqs if not faq['question'] in questions]
+        FAQ.objects.bulk_create(faq_models)
+        
+        # Articles
+        headlines = [a.headline for a in Article.objects.all()]
+        article_models = [Article(**article) for article in articles if not article['headline'] in headlines]
         Article.objects.bulk_create(article_models)
-
-        # Requirements
-        available_requirements = Requirement.objects.all()
-        available_requirement_texts = [r.text for r in available_requirements]
-        r_models = [Requirement(**r) for r in requirements if not r['text'] in available_requirement_texts]
-        Requirement.objects.bulk_create(r_models)
-
-        # Criteria
-        available_criteria = Criterion.objects.all()
-        available_criteria_text = [c.text for c in available_criteria]
-        c_models = [Criterion(text=c) for c in criteria if not c in available_criteria_text]        
-        Criterion.objects.bulk_create(c_models)
 
         # Add bank models
         available_banks = Bank.objects.all()
@@ -72,10 +64,10 @@ class Command(BaseCommand):
                     print(e)
 
                 
-        for ins_type in inst_types:
+        for ins_type in institutions_by_type:
             i_type = InstitutionType.objects.create(name=ins_type)
             
-            for inst in inst_types[ins_type]:
+            for inst in institutions_by_type[ins_type]:
                 Institution.objects.create(institution_type=i_type, name=inst)
 
         print('Database populated successfully!!!')

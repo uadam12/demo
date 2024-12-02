@@ -1,49 +1,24 @@
-{% extends 'base.html' %}
+{% for course in data %}
+<tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ course.title }}</td>
+    <td>{{ course.course_type }}</td>
+    <td>
+        <div class="btn-group" hx-target="#dialog">
+            <a href="{{ course.update_url }}" hx-get="{{ course.update_url }}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i>
+            </a>
 
-{% block content %}
-    {% include "../parts/filter-form.html" with filter_label="Filter Academic Courses" %}
-
-    <div class="d-flex justify-content-between align-items-center mt-5">
-        <h1>Courses of studies</h1>
-
-        <a href="{% url 'academic:create-course' %}" class="btn btn-success">
-            <i class="bi bi-plus"></i> Create
-        </a>
-    </div>
-
-    <div class="table-responsive mb-5">
-        <table class="table table-bordered table-hover table-striped">
-            <tr>
-                <th>S/N</th>
-                <th>Title</th>
-                <th>Type</th>
-                <th>Actions</th>
-            </tr>
-            
-            {% for course in courses %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ course.title }}</td>
-                <td>{{ course.course_type }}</td>
-                <td>
-                    <div class="btn-group">
-                        <a href="{% url 'academic:update-course' id=course.id %}" class="btn btn-warning">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                
-                        <a href="{% url 'academic:delete-course' id=course.id %}" class="btn btn-danger">
-                            <i class="bi bi-trash"></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4" class="text-center text-muted">
-                    There is no available course
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-{% endblock %}
+            <a href="{{ course.delete_url }}" hx-get="{{ course.delete_url }}" class="btn btn-danger">
+                <i class="bi bi-trash"></i>
+            </a>
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="4" class="text-center text-muted">
+        There is no available course
+    </td>
+</tr>
+{% endfor %}

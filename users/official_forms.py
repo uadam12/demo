@@ -38,14 +38,40 @@ class UserForm(forms.ModelForm):
         
         return user
 
-class AdminForm(UserForm):
+class OfficialForm(forms.ModelForm):
+    is_admin = forms.BooleanField(help_text='Check if the official is an adminstrator', required=False)
+    
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email')
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.fields['first_name'].widget.attrs = {
+            'placeholder': 'Enter official firstname',
+        }
+        
+        self.fields['last_name'].widget.attrs = {
+            'placeholder': 'Enter official lastname',
+        }
+        
+        self.fields['email'].widget.attrs = {
+            'placeholder': 'Enter official email address',
+        }
+
     def save(self, commit=True):
-        user = super().save(commit=False)
+        user:User = super().save(commit=False)
         user.access_code = 3
         if commit: user.save()
+        
+        if commit is True: 
+            if not user.password:
+                user.set_password('bssb@123')
+            
+            access_code = 3 if self.cleaned_data['is_admin'] else 2
+            user.access_code = access_code
+            user.save()
         
         return user
 

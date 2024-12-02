@@ -1,28 +1,13 @@
 from django import forms
-from django.urls import reverse
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Submit, Div
 from crispy_forms.bootstrap import InlineCheckboxes
-from app import get_or_none
-from board.models import Criterion, Requirement
-from academic.models import Institution, Program
-from .models import Scholarship, ScholarshipProgram, ApplicationDocument, Application
+from .models import Scholarship, ApplicationDocument
 
 class DateInput(forms.DateInput):
     input_type = 'date'
 
 class ScholarshipForm(forms.ModelForm):
-    criteria = forms.ModelMultipleChoiceField(
-        queryset=Criterion.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
-        required=True
-    )
-    requirements = forms.ModelMultipleChoiceField(
-        queryset=Requirement.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
-        required=True
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
@@ -64,78 +49,16 @@ class ScholarshipForm(forms.ModelForm):
         exclude = ("applicants", "programs")
 
 
-class ScholarshipProgramForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        self.scholarship = kwargs.pop('scholarship', None)
-        super().__init__(*args, **kwargs)
-        
-        self.fields['program'].empty_label = 'Select Program'
-        self.fields['disbursement_amount'].widget.attrs['placeholder'] = 'Enter disbursement amount per applicant'
-
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            'program', 'disbursement_amount',
-            Div(
-                Submit('save', 'Save Program'),
-                css_class='text-end'
-            )
-        )
-        
-    def save(self, commit:bool=True) -> ScholarshipProgram:
-        if self.scholarship:
-            scholarship_program = super().save(commit=False)
-            scholarship_program.scholarship = self.scholarship
-            if commit: scholarship_program.save()
-            return scholarship_program
-
-        return super().save(commit=commit)
-    
+class ApplicationDocumentForm(forms.ModelForm):
     class Meta:
-        model = ScholarshipProgram
-        exclude = ("scholarship", )
-
-
-class ApplicationForm(forms.Form):
-    def __init__(self, application:Application, *args, **kwargs):
+        model = ApplicationDocument
+        fields = ("name", "required")
+        
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        self.fields['name'].widget.attrs['placeholder'] = 'Enter application document name'
 
-        self.instance = application
-        self.documents_fieldnames = []
-
-        for requirement in application.scholarship.requirements.all():
-            document = get_or_none(ApplicationDocument, requirement=requirement)
-            fieldname = f"application_document_{requirement.pk}"
-
-            self.fields[fieldname] = forms.ImageField(
-                label=requirement.text,
-                required=requirement.is_compulsory and document is None
-            )
-
-            self.documents_fieldnames.append(fieldname)
-            
-        self.helper = FormHelper()
-        self.helper.form_method = 'POST'
-        self.helper.form_id = 'document_form'
-        self.helper.form_enctype = 'multipart/form-data'
-        self.helper.layout = Layout(
-            *self.documents_fieldnames,
-            Div(
-                Submit('upload', 'Apply Now'),
-                css_class='text-end'
-            )
-        )
-    
-    def save(self):
-        for field_name in self.documents_fieldnames:
-            image = self.cleaned_data.get(field_name)
-            if image:
-                id = int(field_name.split('_')[2])
-                document, _ = ApplicationDocument.objects.get_or_create(
-                    application = self.instance,
-                    requirement_id = id
-                )
-                
-                document.image = image
-                document.save()
-
-        return True
+ApplicationDocumentForms = forms.modelformset_factory(
+    ApplicationDocument, form=ApplicationDocumentForm, extra=0
+)

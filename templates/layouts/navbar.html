@@ -7,7 +7,7 @@
     <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-md-center">
         <li class="nav-item">
             <a class="nav-link" href="{% url 'main:news' %}">
-                <i class="bi bi-newspaper"></i> 
+                <i class="bi bi-newspaper"></i>
                 News
             </a>
         </li>
@@ -18,39 +18,71 @@
                 About
             </a>
         </li>
-        
+
+        {% if user.is_authenticated %}
         <li class="nav-item">
             <a class="nav-link" href="{% url 'main:contact' %}">
                 <i class="bi bi-telephone"></i>
                 Contact
             </a>
         </li>
-        
+        {% endif %}
+
         <li class="nav-item">
             <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" id="dark-mode">
                 <label class="form-check-label" for="dark-mode">
                     Dark Mode
                 </label>
-             </div>
+            </div>
+        </li>
+
+        <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" id="notifications-menu" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <span class="position-relative btn btn-text">
+                    <i class="bi bi-bell"></i>
+                    {% if notification.unread > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ notification.unread }}
+                        <span class="visually-hidden">New notifications</span>
+                    </span>
+                    {% endif %}
+                </span>
+            </button>
+
+            <ul class="dropdown-menu dropdown-flush" aria-labelledby="notifications-menu">
+                {% for note in notification.messages %}
+                <li class="dropdown-item {% if not note.read %} fw-bold {% endif %}">
+                    {{ note.message }}
+                </li>
+                {% if not forloop.last %} <li>
+                    <hr class="dropown-divider">
+                </li> {% endif %}
+
+                {% empty %}
+                <li class="dropdown-item text-muted">
+                    No available notification
+                </li>
+                {% endfor %}
+            </ul>
         </li>
     </ul>
 
     <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-md-center">
         {% if user.is_authenticated %}
-        {% if user.access_code == 1 %}
-        <li class="nav-item">
-            <a href="{% url 'applicant:profile' %}" class="nav-link">
+
+        {% if user.access_code == 1 %} <li class="nav-item">
+            <a href="{{ user.profile }}" class="nav-link">
                 <img src="{{ user.picture.url }}" width="35px" height="35px" alt="avater" class="img rounded-circle">
                 Profile
             </a>
-        </li>
-        {% endif %}
-        
+        </li> {% endif %}
+
 
         <li class="nav-item">
-            <a href="{% url user.dashboard %}" class="nav-link">
-                <i class="bi bi-house"></i>
+            <a href="{{ user.dashboard }}" class="nav-link">
+                <i class="bi bi-speedometer2"></i>
                 Dashboard
             </a>
         </li>

@@ -1,45 +1,23 @@
-{% extends 'base.html' %}
+{% for inst_type in data %}
+<tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ inst_type }}</td>
+    <td>
+        <div class="btn-group" hx-target="#dialog">
+            <a href="{{ inst_type.update_url }}" hx-get="{{ inst_type.update_url }}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i>
+            </a>
 
-{% block content %}
-    <div class="d-flex justify-content-between align-items-center mt-5">
-        <h1>Institution Types</h1>
-
-        <a href="{% url 'academic:create-institution-type' %}" class="btn btn-success">
-            <i class="bi bi-plus"></i> Create
-        </a>
-    </div>
-
-    <div class="table-responsive mb-5">
-        <table class="table table-bordered table-hover table-striped">
-            <tr>
-                <th>S/N</th>
-                <th>Name</th>
-                <th>Actions</th>
-            </tr>
-            
-            {% for inst_type in institution_types %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ inst_type }}</td>
-                <td>
-                    <div class="btn-group">
-                        <a href="{% url 'academic:update-institution-type' id=inst_type.id %}" class="btn btn-warning">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                
-                        <a href="{% url 'academic:delete-institution-type' id=inst_type.id %}" class="btn btn-danger">
-                            <i class="bi bi-trash"></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3" class="text-center text-muted">
-                    There is no available institution type
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-{% endblock %}
+            <a href="{{ inst_type.delete_url }}" hx-get="{{ inst_type.delete_url }}" class="btn btn-danger">
+                <i class="bi bi-trash"></i>
+            </a>
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="3" class="text-center text-muted">
+        There is no available institution type
+    </td>
+</tr>
+{% endfor %}

@@ -28,8 +28,7 @@ urlpatterns = [
     path('payment/', include('payment.urls')),
     path('academic/', include('academic.urls')),
     path('applicant/', include('applicant.urls')),
-    path('official/', include('users.official_urls')),
-    path('registration/', include('registration.urls')),
+    path('officials/', include('users.official_urls')),
     path('scholarships/', include('scholarship.urls')),
 ]
 

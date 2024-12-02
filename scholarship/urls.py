@@ -12,9 +12,13 @@ urlpatterns = [
     path('<int:id>/add-program/', views.add_scholarship_program, name='add-program'),
     path('programs/<int:id>/update/', views.update_scholarship_program, name='update-program'),
     path('programs/<int:id>/delete/', views.delete_scholarship_program, name='delete-program'),
+    
+    # Registration Documents
+    path('app-documents/<int:id>/', views.app_docuements, name='app-documents'),
+    path('app-documents/<int:id>/create/', views.create_app_docuement, name='create-app-document'),
+    path('app-documents/<int:id>/update/', views.update_app_document, name='update-app-document'),
+    path('app-documents/<int:id>/delete/', views.delete_app_document, name='delete-app-document'),
 
-    path('internals/', views.internal_scholarships, name='internals'),
-    path('externals/', views.external_scholarships, name='externals'),
     path('applications/', app_views.applications, name='applications'),
     path('applications/<int:id>', app_views.scholarship_applications, name='scholarship-applications'),
     path('applications/<str:application_id>', app_views.application, name='application'),

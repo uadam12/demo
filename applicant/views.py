@@ -1,35 +1,28 @@
-import json
 from django.shortcuts import  get_object_or_404, redirect
-from django.template.context_processors import csrf
+from django.urls import reverse_lazy
 from django.http import HttpResponse
 from django.contrib import messages
-from crispy_forms.utils import render_crispy_form
+from django.http import HttpResponse
 from applicant.models import Referee
 from users.forms import ProfilePictureForm
-from app import is_post, get_or_none, render
-from app.auth import applicant_only
-from scholarship.models import Scholarship
-from scholarship.forms import ApplicationForm, Application
-from payment.models import ApplicationFEE
+from app import is_post, get_or_none, render, render_form
+from app.views import create_view, update_view, delete_view
+from app.auth import applicant_only, complete_profile_required
+from scholarship.models import Scholarship, Application, ApplicationDocument, Document
 from payment.remita import remita
 from .forms import (
     PersonalInformationForm, PersonalInformation,
     AcademicInformationForm, AcademicInformation,
     AccountBankForm, AccountBank, RefereeForm,
     SchoolAttendedForm, SchoolAttended,
-    DocumentForm, Document
+    DocumentForms, ApplictionDocumentForm
 )
-
-def render_form(request, form):
-    ctx = {}
-    ctx.update(csrf(request))
-    return HttpResponse(render_crispy_form(form, context=ctx))
 
 
 # Create your views here.
 @applicant_only
 def dashboard(request):
-    applications = request.user.applications.all()
+    applications = Application.objects.filter(applicant = request.user) 
     return render(
         request, 'applicants/dashboard', 
         applications = applications,
@@ -54,19 +47,24 @@ def profile(request):
     academic_info = get_or_none(AcademicInformation, user=user)
     account_bank = get_or_none(AccountBank, user=user)
     referee = get_or_none(Referee, user=user)
-    documents = Document.objects.filter(owner=user).all()
+    documents = user.registration_documents
 
     return render(
         request, 'applicants/profile', 
-        title='BSSB Applicant Profile',
+        title='Applicant Profile',
         applicant_form = PersonalInformationForm(instance=applicant),
         academic_form = AcademicInformationForm(instance=academic_info),
         profile_picture_form = ProfilePictureForm(instance=request.user),
         bank_form = AccountBankForm(instance=account_bank),
         referee_form = RefereeForm(instance=referee),
         schools = SchoolAttended.objects.filter(user=request.user),
-        document_form = DocumentForm(user=user),
-        documents = documents, with_htmx = True,
+        document_forms = DocumentForms(queryset=documents),
+        data_url = reverse_lazy('applicant:schools-attended'),
+        documents = documents, with_htmx = True, with_modal = True,
+        data_template="applicants/schools.html",  data_header='Schools Attended',
+        add_url=reverse_lazy('applicant:add-school'), table_headers = [
+            'School Name', 'Certificate Obtained', 'Year Started', 'Year Finish', 'Actions'
+        ]
     )
 
 @applicant_only
@@ -132,66 +130,55 @@ def account_details(request):
 @applicant_only
 def schools_attended(request):
     schools = SchoolAttended.objects.filter(user=request.user).all()
-    return render(request, 'parts/schools-attended', schools=schools)
+    return render(request, 'applicants/schools', schools=schools)
 
 @applicant_only
 def add_school(request):
-    form = SchoolAttendedForm()
-    
-    if is_post(request):
-        form = SchoolAttendedForm(request.POST)
-        if form.is_valid():
-            school = form.save(False)
-            school.user = request.user
-            school.save()
+    def save(school):
+        school.user = request.user
+        school.save()
+        messages.success(request, f"{school} added.")
 
-            response = HttpResponse(status=204)
-            response['HX-Trigger'] = 'schoolListChanged'
-            
-            messages.success(request, f"{school} added.")
-            return response
-
-    return render(request, 'parts/school-form', form=form, modal_header='Add School Attended')
+    return create_view(
+        request, SchoolAttendedForm,
+        'applicant:profile', 'Add School',
+        save_instantly=False,
+        further_action = save
+    )
 
 @applicant_only
 def update_school(request, pk):
     school = get_object_or_404(SchoolAttended, pk=pk)
-    form = SchoolAttendedForm(instance=school)
+
+    def save(school):
+        messages.success(request, f"{school} updated.")
     
-    if is_post(request):
-        form = SchoolAttendedForm(request.POST, instance=school)
-        if form.is_valid():
-            school = form.save(False)
-            school.user = request.user
-            school.save()
-
-            messages.success(request, f"{school} updated successfully.")
-            response = HttpResponse(status=204)
-            response['HX-Trigger'] = 'schoolListChanged'
-            return response
-
-    return render(request, 'parts/school-form', form=form, modal_header='Update School Attended')
+    return update_view(
+        request, SchoolAttendedForm, school,
+        'applicant:schools-attended',
+        form_header='Update School',
+        further_action = save
+    )
 
 @applicant_only
 def delete_school(request, pk):
     school = get_object_or_404(SchoolAttended, pk=pk)
-    
-    if is_post(request):
-        school.delete()
-        messages.success(request, f"{school} deleted.")
-        return HttpResponse(status=204)
-
-
-    return render(request, 'parts/delete-school-confirmation', school=school)
+    return delete_view(request, school, 'applicant:profile', 'Delete School')
 
 @applicant_only
 def documents(request):
-    form = DocumentForm(user=request.user)
+    docs = request.user.registration_documents
+    form = DocumentForms(queryset=docs)
 
     if is_post(request):
-        form = DocumentForm(request.POST, request.FILES, user=request.user)
+        form = DocumentForms(data=request.POST, files=request.FILES, queryset=docs)
         if form.is_valid() and form.save():
             messages.success(request, "Registration documents uploaded successfully!!!")
+
+        return render(
+            request, 'parts/applicant-documents', document_forms = form,
+            documents = docs
+        )
     
     return render_form(request, form)
 
@@ -207,15 +194,18 @@ def referees(request):
             referee = form.save(False)
             referee.user = request.user
             referee.save()
-
-            messages.success(request, "Referee Save successfully.")
-    
+            messages.success(request, "Referee Save successfully.")    
 
     return render_form(request, form)
 
 @applicant_only
 def scholarships(request):
-    scholarships = Scholarship.objects.all()
+    applications = Application.objects.filter(applicant = request.user).prefetch_related('scholarship')
+    applied_scholarships = []
+    for app in applications:
+        applied_scholarships.append(app.scholarship.id)
+        
+    scholarships = Scholarship.objects.exclude(pk__in=applied_scholarships).all()
     
     return render(
         request, 'applicants/scholarships', 
@@ -223,29 +213,39 @@ def scholarships(request):
         title="Open Scholarships"
     )
     
-@applicant_only
+def get_application_documents(application:Application) -> list[Document]:
+    app_documents = ApplicationDocument.objects.filter(scholarship=application.scholarship).all()
+    for app_document in app_documents:
+        Document.objects.get_or_create(app_document=app_document, application=application)
+    
+    return Document.objects.filter(application=application)
+
+
+@complete_profile_required
 def apply(request, id):
     scholarship = get_object_or_404(Scholarship, id=id)
-    applicant_has_paid_application_fee = ApplicationFEE.objects.filter(scholarship=scholarship, applicant=request.user).exists()
-    
-    if not applicant_has_paid_application_fee:
+    application = Application.objects.filter(scholarship=scholarship, applicant=request.user).first()
+
+    if not (application and application.application_fee_payment):
         return redirect('payment:application-fee', id=id)
-    
-    application = Application.get_or_create(
-        request.user,
-        scholarship
-    )
-    form = ApplicationForm(application)
-    
+    app_docs = get_application_documents(application)
+    form = ApplictionDocumentForm(queryset=app_docs)
+    form.is_valid()
+
     if is_post(request):
-        form = ApplicationForm(application, data=request.POST, files=request.FILES)
-        if form.is_valid() and form.save():
+        form = ApplictionDocumentForm(
+            data=request.POST, files=request.FILES, queryset=app_docs
+        )
+        if form.is_valid():
+            form.save()
             messages.success(request, f'You have successfully applied for {scholarship}')
+            application.status = 'pending'
+            application.save()
             return redirect('applicant:dashboard')
 
     return render(
         request, 'applicants/apply', 
         scholarship = scholarship,
-        form = form,
+        forms = form,
         title=f"Application for {scholarship}"
     )

@@ -92,7 +92,7 @@ def generate_application_form(application):
     
     doc.add_space(60)
     doc.add(Signature(
-        application.applied_on.strftime('%d %B, %Y')
+        application.submitted_at.strftime('%d %B, %Y')
     ))
 
     return doc.generate_pdf()

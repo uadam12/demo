@@ -1,8 +1,6 @@
 from django.contrib import admin
-from .models import Payment, ApplicationFEE, Disbursement
+from .models import Payment
 
 
 # Register your models here.
 admin.site.register(Payment)
-admin.site.register(ApplicationFEE)
-admin.site.register(Disbursement)

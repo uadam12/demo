@@ -2,22 +2,18 @@ from django.http import HttpResponse
 from crispy_forms.templatetags.crispy_forms_filters import as_crispy_field
 from users.forms import RegisterForm
 
-def nin(request):
-    form = RegisterForm(request.POST)
+def validate_field(form, field):
     form.is_valid()
-    return HttpResponse(as_crispy_field(form['nin']))
+    return HttpResponse(as_crispy_field(form[field]))
+
+def nin(request):
+    return validate_field(RegisterForm(request.POST), 'nin')
 
 def bvn(request):
-    form = RegisterForm(request.POST)
-    form.is_valid()
-    return HttpResponse(as_crispy_field(form['bvn']))
+    return validate_field(RegisterForm(request.POST), 'bvn')
 
 def email(request):
-    form = RegisterForm(request.POST)
-    form.is_valid()
-    return HttpResponse(as_crispy_field(form['email']))
-
+    return validate_field(RegisterForm(request.POST), 'email')
+ 
 def phone_number(request):
-    form = RegisterForm(request.POST)
-    form.is_valid()
-    return HttpResponse(as_crispy_field(form['phone_number']))
+    return validate_field(RegisterForm(request.POST), 'phone_number')

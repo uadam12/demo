@@ -3,44 +3,27 @@ from . import views
 
 app_name = 'main'
 
-"""
-# Requirements
-def requirements(request):
-    return details_view(
-        request, RequirementForm, 
-        header="Requirement",
-        data_template="board/requirements.html",
-        requirements = Requirement.objects.order_by('label')
-    )
-
-def update_requirement(request, id):
-    requirement = Requirement.objects.get(id=id)
-    
-    return update_view(
-        request, 
-        model=requirement, 
-        form_class=RequirementForm, 
-        success_url='board:requirements', 
-        header='Requirement'
-    )
-
-    
-def delete_requirement(request, id):
-    requirement = Requirement.objects.get(id=id)
-    
-    return delete_view(
-        request, 
-        model=requirement,
-        success_url='board:requirements', 
-        header='Requirement'
-    )
-"""
 
 urlpatterns = [
     path('', views.index, name='home'),
     path('news/', views.news, name='news'),
     path('about/', views.about, name='about'),
-    path('contact/', views.contact, name='contact'),
+    path('contact/', views.contact_us, name='contact'),
+    path('reply/<int:contact_id>/', views.reply, name='reply'),
+
+    # Frequently Asked Questions(FAQs)
+    path('faqs/', views.faqs, name='faqs'),
+    path('faqs/<int:id>/', views.faq, name='faq'),
+    path('faqs/create/', views.create_faq, name='create-faq'),
+    path('faqs/<int:id>/update/', views.update_faq, name='update-faq'),
+    path('faqs/<int:id>/delete/', views.delete_faq, name='delete-faq'),
+    
+    # Contacts and Notifications
+    path('contacts/', views.contacts, name='contacts'),
+    path('notifications/', views.notifications, name='notifications'),
+    path('notifications/create/', views.create_notification, name='create-notification'),
+    path('notifications/<int:id>/update/', views.update_notification, name='update-notification'),
+    path('notifications/<int:id>/delete/', views.delete_notification, name='delete-notification'),
     
     # Articles
     path('articles/', views.articles, name='articles'),

@@ -1,8 +1,12 @@
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from app import render
-from app.views import update_view, delete_view, create_view
+from app.views import update_view, delete_view, create_view, data_view
 from app.auth import officials_only
-from .filters import CourseFilter, LevelFilter, InstitutionFilter
+from .filters import (
+    CourseFilter, LevelFilter, InstitutionFilter, 
+    ProgramFilter, InstitutionTypeFilter, CourseTypeFilter
+)
 from .forms import (
     InstitutionType, InstitutionTypeForm,
     Institution, InstitutionForm,
@@ -16,10 +20,12 @@ from .forms import (
 # Institution Types
 @officials_only()
 def institution_types(request):
-    return render(
-        request, "academic/institution-types",
-        title='BSSB | Institution Types',
-        institution_types = InstitutionType.objects.all()
+    filter = InstitutionTypeFilter(request.GET, queryset=InstitutionType.objects.all())
+    return data_view(
+        request, title='Institution Types',
+        data_template="academic/institution-types.html",
+        table_headers=['S/N', 'Name', 'Action'], filter_form=filter.form,
+        data=filter.qs, add_url=reverse('academic:create-institution-type')
     )
 
 def institution_type(request):
@@ -38,39 +44,33 @@ def create_institution_type(request):
     return create_view(
         request, form_class=InstitutionTypeForm, 
         success_url='academic:institution-types', 
-        header='Create Institution Type'
+        form_header='Create Institution Type'
     )
 
 @officials_only(admin_only=True)
 def update_institution_type(request, id):
-    institution_type = get_object_or_404(InstitutionType, id=id)
+    inst_type = get_object_or_404(InstitutionType, id=id)
     
     return update_view(
-        request, instance=institution_type, 
+        request, instance=inst_type, 
         form_class=InstitutionTypeForm, 
-        success_url='academic:institution-types', 
-        header=f'Update {institution_type}'
+        form_header=f'Update {inst_type}'
     )
 
 @officials_only(admin_only=True)
 def delete_institution_type(request, id):
-    institution_type = get_object_or_404(InstitutionType, id=id)
-    
-    return delete_view(
-        request, model=institution_type,
-        success_url='academic:institution-types', 
-        header='Delete Institution Type'
-    )
+    inst_type = get_object_or_404(InstitutionType, id=id)
+    return delete_view(request, model=inst_type, header='Delete Institution Type')
 
 # Institutions
 @officials_only()
 def institutions(request):
     filter = InstitutionFilter(request.GET, queryset=Institution.objects.all())
-    return render(
-        request, "academic/institutions",
-        title='BSSB | Institutions',
-        institutions = filter.qs,
-        form = filter.form
+    return data_view(
+        request, title='Institutions',
+        data_template="academic/institutions.html",
+        table_headers=['S/N', 'Name', 'Type', 'Action'], filter_form=filter.form,
+        data=filter.qs.prefetch_related('institution_type'), add_url=reverse('academic:create-institution')
     )
 
 @officials_only(admin_only=True)
@@ -78,7 +78,7 @@ def create_institution(request):
     return create_view(
         request, form_class=InstitutionForm, 
         success_url='academic:institutions', 
-        header='Create Institution'
+        form_header='Create Institution'
     )
 
 @officials_only(admin_only=True)
@@ -89,8 +89,7 @@ def update_institution(request, id):
         request, 
         instance=institution, 
         form_class=InstitutionForm, 
-        success_url='academic:institutions', 
-        header='Update Institution'
+        form_header='Update Institution'
     )
     
 @officials_only(admin_only=True)
@@ -99,7 +98,6 @@ def delete_institution(request, id):
     
     return delete_view(
         request, model=institution,
-        success_url='academic:institutions', 
         header='Delete Institution'
     )
 
@@ -107,10 +105,13 @@ def delete_institution(request, id):
 # Programs
 @officials_only()
 def programs(request):
-    return render(
-        request, "academic/programs",
-        title='BSSB | Institutions',
-        programs = Program.objects.all(),
+    filter = ProgramFilter(request.GET, queryset=Program.objects.all())
+
+    return data_view(request, 
+        data_template="academic/programs.html",
+        title='Programs', filter_form=filter.form,
+        table_headers=['S/N', 'Program Name', 'Action'],
+        data=filter.qs, add_url=reverse('academic:create-program')
     )
 
 def program(request):
@@ -128,8 +129,8 @@ def program(request):
 def create_program(request):
     return create_view(
         request, form_class=ProgramForm, 
-        success_url='academic:programs', 
-        header='Create Program'
+        success_url='academic:programs',
+        form_header='Create Program'
     )
 
 @officials_only(admin_only=True)
@@ -138,29 +139,24 @@ def update_program(request, id):
     
     return update_view(
         request, instance=program, 
-        form_class=ProgramForm, 
-        success_url='academic:programs', 
-        header='Delete Program'
+        form_class=ProgramForm, form_header='Update Program'
     )
-
 
 @officials_only(admin_only=True)    
 def delete_program(request, id):
     program = get_object_or_404(Program, id=id)
-
-    return delete_view(
-        request, model=program,
-        success_url='academic:programs', 
-        header='Delete Program'
-    )
+    return delete_view(request, model=program, header='Delete Program')
 
 # Course types
 @officials_only()
 def course_types(request):
-    return render(
-        request, "academic/course-types",
-        title='BSSB | Course Types',
-        course_types = CourseType.objects.all(),
+    filter = CourseTypeFilter(request.GET, queryset=CourseType.objects.all())
+
+    return data_view(
+        request, title='Course Types',
+        data_template="academic/course-types.html",
+        data=filter.qs, add_url=reverse('academic:create-course-type'),
+        table_headers=['S/N', 'Title', 'Action'], filter_form=filter.form,
     )
 
 def course_type(request):
@@ -179,7 +175,7 @@ def create_course_type(request):
     return create_view(
         request, form_class=CourseTypeForm, 
         success_url='academic:course-types', 
-        header='Create Course Type'
+        form_header='Create Course Type'
     )
 
 @officials_only(admin_only=True)
@@ -189,8 +185,7 @@ def update_course_type(request, id):
     return update_view(
         request, instance=course_type, 
         form_class=CourseTypeForm, 
-        success_url='academic:course-types', 
-        header='Update Course Type'
+        form_header='Update Course Type'
     )
 
 @officials_only(admin_only=True)
@@ -199,7 +194,6 @@ def delete_course_type(request, id):
     
     return delete_view(
         request, model=course_type,
-        success_url='academic:course-types', 
         header='Delete Course Type'
     )
 
@@ -207,11 +201,13 @@ def delete_course_type(request, id):
 @officials_only()
 def courses(request):
     filter = CourseFilter(request.GET, queryset=Course.objects.all())
-    return render(
-        request, "academic/courses",
-        title='BSSB | Courses',
-        courses = filter.qs,
-        form = filter.form
+    return data_view(
+        request, title='Courses',
+        filter_form = filter.form,
+        data_template="academic/courses.html",
+        add_url=reverse('academic:create-course'),
+        data=filter.qs.prefetch_related('course_type'), 
+        table_headers=['S/N', 'Title', 'Type', 'Action']
     )
 
 @officials_only(admin_only=True)
@@ -219,39 +215,30 @@ def create_course(request):
     return create_view(
         request, form_class=CourseForm, 
         success_url='academic:courses', 
-        header='Create Course'
+        form_header='Create Course'
     )
 
 @officials_only(admin_only=True)
 def update_course(request, id):
     course = get_object_or_404(Course, id=id)
     
-    return update_view(
-        request, instance=course, 
-        form_class=CourseForm, 
-        success_url='academic:courses', 
-        header='Update Course'
-    )
+    return update_view(request, instance=course, form_class=CourseForm, form_header='Update Course')
 
 @officials_only(admin_only=True)
 def delete_course(request, id):
     course = get_object_or_404(Course, id=id)
     
-    return delete_view(
-        request, model=course,
-        success_url='academic:courses', 
-        header='Delete Course'
-    )
+    return delete_view(request, model=course, header='Delete Course')
     
 # Levels
 @officials_only()
 def levels(request):
     filter = LevelFilter(request.GET, queryset=Level.objects.all())
-    return render(
-        request, "academic/levels",
-        title='BSSB | Levels',
-        levels = filter.qs,
-        form = filter.form
+    return data_view(
+        request, filter_form = filter.form,
+        title='Levels', data_template="academic/levels.html",
+        table_headers=['S/N', 'Name', 'Code', 'Program', 'Action'],
+        data=filter.qs.prefetch_related('program'), add_url=reverse('academic:create-level')
     )
 
 @officials_only(admin_only=True)
@@ -259,7 +246,7 @@ def create_level(request):
     return create_view(
         request, form_class=LevelForm, 
         success_url='academic:levels', 
-        header='Create Level'
+        form_header='Create Level'
     )
 
 @officials_only(admin_only=True)
@@ -269,16 +256,10 @@ def update_level(request, id):
     return update_view(
         request, instance=level, 
         form_class=LevelForm, 
-        success_url='academic:levels', 
-        header='Update Level'
+        form_header='Update Level'
     )
 
 @officials_only(admin_only=True)
 def delete_level(request, id):
     level = get_object_or_404(Level, id=id)
-    
-    return delete_view(
-        request, model=level,
-        success_url='academic:levels', 
-        header='Delete Level'
-    )
+    return delete_view(request, model=level, header='Delete Level')

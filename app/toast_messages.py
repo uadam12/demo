@@ -36,8 +36,6 @@ class ToastMiddlewere:
             }
 
         trigger['messages'] = messages
-        
-        print(dumps(messages, indent=4))
         response.headers['HX-Trigger'] = dumps(trigger)
 
         return response

@@ -57,7 +57,6 @@ def register(request):
 def activate(request, token):
     User = get_user_model()
     email = verify_token(token)
-    print(email)
     user = User.objects.filter(email=email)
     
     if user.exists():

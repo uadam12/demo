@@ -2,8 +2,8 @@ from django import forms
 from django.urls import reverse
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Div, Submit, Field
-from app import get_or_none
-from registration.models import Registration, Document
+from users.models import Document
+from scholarship.models import Document as SDocument
 from .models import PersonalInformation, AcademicInformation, AccountBank, SchoolAttended, Referee
 
 class DateInput(forms.DateInput):
@@ -178,52 +178,45 @@ class RefereeForm(forms.ModelForm):
             )
         )
 
-class DocumentForm(forms.Form):
+class DocumentForm(forms.ModelForm):
+    class Meta:
+        model = Document
+        fields = ("image",)
+        
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
-        
-        if not hasattr(self, 'instantance') and self.user is None:
-            raise ValueError('User argument is required!!!')
-
         super().__init__(*args, **kwargs)
-    
-        registration = Registration.load()
-        self.documents_fieldnames = []
         
-        for requirement in registration.requirements.all():
-            document = get_or_none(Document, owner=self.user, requirement=requirement)
-            fieldname = f"registration_document_{requirement.pk}"
-            
-            self.fields[fieldname] = forms.ImageField(
-                label=requirement.text,
-                required=requirement.is_compulsory and document is None
-            )
-            
-            self.documents_fieldnames.append(fieldname)
+        if not self.instance:
+            raise ValueError('Document is required')
         
+        is_required = self.instance.reg.required and not self.instance.image
+        self.fields['image'].label = self.instance.reg
+        self.fields['image'].required = is_required
         self.helper = FormHelper()
-        self.helper.attrs['hx-target'] = 'this'
-        self.helper.attrs['hx-post'] = reverse('applicant:save-document')
-        self.helper.attrs['hx-encoding'] = 'multipart/form-data'
-        self.helper.layout = Layout(
-            *self.documents_fieldnames,
-            Div(
-                Submit('save', 'Save Documents'),
-                css_class='text-end'
-            )
-        )
+        self.helper.form_tag =False
+        self.helper.disable_csrf = True
         
-    def save(self):
-        for field_name in self.documents_fieldnames:
-            image = self.cleaned_data.get(field_name)
-            if image:
-                id = int(field_name.split('_')[2])
-                document, _ = Document.objects.get_or_create(
-                    owner = self.user,
-                    requirement_id = id
-                )
-                
-                document.image = image
-                document.save()
+class SDocumentForm(forms.ModelForm):
+    class Meta:
+        model = SDocument
+        fields = ("image",)
 
-        return True
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        if not self.instance:
+            raise ValueError('Document is required')
+        
+        self.fields['image'].label = self.instance.app_document
+        self.fields['image'].required = self.instance.app_document.required
+        self.helper = FormHelper()
+        self.helper.form_tag =False
+        self.helper.disable_csrf = True
+
+ApplictionDocumentForm = forms.modelformset_factory(
+    SDocument, form=SDocumentForm, extra=0
+)
+
+DocumentForms = forms.modelformset_factory(
+    Document, form=DocumentForm, extra=0
+)

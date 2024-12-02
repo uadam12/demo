@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-3 order-md-2">
+            <div class="accordion" id="filter-accordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#filter-form" aria-expanded="false" aria-controls="flush-collapseOne">
+                            Filter Applicants
+                        </button>
+                    </h2>
+                </div>
+
+                <div id="filter-form" class="accordion-collapse collapse" data-bs-parent="#filter-accordion">
+                    <div class="accordion-body">
+                        <form hx-target="#applicants" hx-trigger="submit, change" hx-get="{{ request.path }}">
+                            {% load crispy_forms_tags %}
+                            {% crispy filter_form %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md order-md-1">
+            <h1>Applicants</h1>
+            <div class="accordion" id="applicants">
+                {% include 'officials/applicants.html' %}
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

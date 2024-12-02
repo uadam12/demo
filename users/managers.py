@@ -26,3 +26,9 @@ class BSSBManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
         
         return self.create_user(email, password, **extra_fields)
+    
+    def officials(self):
+        return self.get_queryset().filter(access_code__gt=1)
+    
+    def applicants(self):
+        return self.get_queryset().filter(access_code__lt=2)

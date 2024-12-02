@@ -10,7 +10,7 @@
     <div class="col">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">{{ scholarship }}</h3>
+                <h3 class="card-title text-success">{{ scholarship }}</h3>
             </div>
     
             <div class="card-body">
@@ -18,22 +18,34 @@
             </div>
     
             <div class="card-footer">
-                <a href="{% url 'applicant:apply' id=scholarship.id %}" class="btn btn-primary">Apply Now</a>
+                <div class="d-grid">
+                    <a href="{% url 'applicant:apply' id=scholarship.id %}" class="btn btn-primary">
+                        <i class="bi bi-thumb-up"></i> Apply Now
+                    </a>
+                </div>
             </div>
         </div>
     </div>
     {% endfor %}
 </div>
 {% else %}
-<div class="card">
+<div class="card mx-auto" style="max-width: 600px;">
     <div class="card-header">
-        <h1 class="card-title">No available Scholarship</h1>
+        <h2 class="card-title text-success">No available Scholarship</h2>
     </div>
 
     <div class="card-body">
         <p class="text-center">
             There is no open scholarship currently, please check back later for a wonderfull scholarship opportunity.
         </p>
+    </div>
+
+    <div class="card-footer">
+        <div class="d-grid">
+            <a href="{{ user.dashboard }}" class="btn btn-success">
+                <i class="bi bi-speedometer2"></i> Go to your Dashboard
+            </a>
+        </div>
     </div>
 </div>
 {% endif %}

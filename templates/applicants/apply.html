@@ -72,7 +72,31 @@
     </div>
 </div>
 
-<h3 class="text-decoration-underline">Upload Application Documents</h3>
-{% load crispy_forms_tags %}
-{% crispy form %}
+
+<form method="post" enctype="multipart/form-data" class="card">
+    {% load crispy_forms_tags %} {% csrf_token %}
+    {{ forms.management_form }}
+
+    <div class="card-header">
+        <h2 class="text-success">Upload Application Documents</h2>
+    </div>
+
+    <div class="card-body">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for form in forms %}
+            <div class="col">
+                {% crispy form %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card-footer">
+        <div class="text-end">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-upload"></i> Complete Application
+            </button>
+        </div>
+    </div>
+</form>
 {% endblock %}

@@ -1,7 +1,6 @@
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Div, Submit
-from crispy_forms.bootstrap import InlineCheckboxes
 from .models import InstitutionType, Institution, Program, CourseType, Course, Level
 
  
@@ -9,15 +8,6 @@ class InstitutionTypeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['name'].widget.attrs['placeholder'] = 'Enter Institution Type Name'
-        
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            'name',
-            Div(
-                Submit('save', "Save Institution Type"),
-                css_class='text-end'
-            )
-        )
 
     class Meta:
         model = InstitutionType
@@ -98,16 +88,9 @@ class CourseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
         self.fields['title'].widget.attrs['placeholder'] = 'Enter Course Title'
+        self.fields['course_type'].empty_label = 'Select Course Type'
         
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            'title',
-            Div(
-                Submit('save', "Save Academic Program"),
-                css_class='text-end'
-            )
-        )
         
     class Meta:
         model = Course
-        fields = ("title", )
+        fields = ("title", "course_type")

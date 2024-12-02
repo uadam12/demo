@@ -1,62 +1,54 @@
 import django_filters as df
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, Div, Submit
-from academic.models import Institution, Program, Course
-from board.models import Bank
-from .models import Application
+from django import forms
+from django.db.models import Q
+from crispy_forms.layout import Layout
+from app.filter import FilterDataSet
+from academic.models import Institution, Program
+from .models import Application, Scholarship
 
-class Filter(df.FilterSet):
+
+class FilterScholarship(FilterDataSet):
+    class Meta:
+        model = Scholarship
+        fields = []
+
+    title = df.CharFilter(
+        field_name='title', lookup_expr='icontains', 
+        label='', widget = forms.TextInput(attrs={
+            'placeholder': 'Search by Name'
+        })
+    )
+
+    @property
+    def form(self):
+        form = super().form
+        form.helper.layout = Layout(self.search_field_with_btn('title'))
+        return form
+
+
+class ApplicationFilter(FilterDataSet):
     class Mete:
         model = Application
         fields = []
     
-    application_id = df.CharFilter(
-        'application_id', lookup_expr='iexact',
-        label='Application ID'
+    term = df.CharFilter(
+        label='', method='filter_application'
     )
 
     institution = df.ModelChoiceFilter(
         field_name = 'institution',
         label = 'Academic Institution',
         empty_label = 'Select Academic Institution',
-        queryset = Institution.objects.all(),
+        queryset = Institution.objects.all()
     )
     
     program = df.ModelChoiceFilter(
         field_name = 'program',
         empty_label = 'Select Program',
         label = 'Program',
-        queryset = Program.objects.all(),
+        queryset = Program.objects.all()
     )
     
-    course_of_study = df.ModelChoiceFilter(
-        field_name = 'course_of_study',
-        empty_label = 'Select Course of Study',
-        label = 'Academic Institution',
-        queryset = Course.objects.all(),
-    )
-    
-    bank = df.ModelChoiceFilter(
-        field_name = 'account_bank__bank',
-        empty_label = 'Select Bank',
-        label = 'Account Bank',
-        queryset = Bank.objects.all(),
-    )
-
-    @property
-    def form(self):
-        form = super().form
-        form.helper = FormHelper()
-        form.helper.form_method = 'get'
-        form.helper.layout = Layout(
-            'application_id', 'status', 'bank', 
-            'institution', 'program', 'course_of_study',
-        )
-        form.helper.add_input(Submit('filter', "Filter Applicants"))
-        
-        return form
-
-class ApplicationFilter(Filter):
     status = df.ChoiceFilter(
         field_name = 'status',
         label = 'Application Status',
@@ -64,10 +56,16 @@ class ApplicationFilter(Filter):
         choices = Application.STATUS
     )
     
-class DisbursementFilter(Filter):
-    status = df.ChoiceFilter(
-        field_name = 'disbursement_status',
-        label = 'Disbursement Status',
-        empty_label = 'Select Disbursement Status',
-        choices = Application.DISBURSEMENT_STATUS
-    )
+    def filter_application(self, queryset, _, value):
+        return queryset.filter(Q(application_id__icontains=value))
+
+    @property
+    def form(self):
+        form = super().form
+        form.fields['term'].widget.attrs['placeholder'] = 'Search applications'
+        form.helper.layout = Layout(
+            'status',  'program',
+            self.search_field_with_btn('term')
+        )
+        
+        return form

@@ -1,64 +1,39 @@
 from django import forms
-from crispy_forms.layout import Layout, Submit, Div, Row, Column
-from crispy_forms.helper import FormHelper
-from .models import Criterion, Requirement, Bank, LGA
+from .models import Board, RegistrationDocument, Bank, LGA
 
 
-class CriterionForm(forms.ModelForm):
+class BoardForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(CriterionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.fields['motto'].widget.attrs['placeholder'] = 'Enter board motto'
+        self.fields['registration_fee'].widget.attrs['placeholder'] = 'Enter registration FEE'
+        self.fields['registration_criteria'].widget.attrs['placeholder'] = 'Enter board registration criteria'
+        self.fields['about'].widget.attrs['placeholder'] = 'Enter information about the board'
         
-        self.fields['text'].widget.attrs['Placeholder'] = 'Enter Criterion text here...'
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            'text',
-            Div(
-                Submit('save', 'Save Criterion'), 
-                css_class='text-end'
-            )
-        )
-    
     class Meta:
-        model = Criterion
-        fields = ("text",)
+        model = Board
+        fields = (
+            "motto", "registration_fee", 
+            "about", "registration_criteria", 
+            "registration_is_open", "new_applicant_can_apply"
+        )
 
-class RequirementForm(forms.ModelForm):
+
+class RegistrationDocumentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(RequirementForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs['placeholder'] = 'Enter document name'
         
-        self.fields['text'].widget.attrs['Placeholder'] = 'Enter Criterion text here...'
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            'text', 'is_compulsory',
-            Div(
-                Submit('save', 'Save Requirement'), 
-                css_class='text-end'
-            )
-        )
-    
     class Meta:
-        model = Requirement
-        fields = ("text", "is_compulsory")
+        model = RegistrationDocument
+        fields = ("name", "required")
+
 
 class BankForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(BankForm, self).__init__(*args, **kwargs)
-        self.fields['name'].widget.attrs['placeholder'] = 'Enter Bank Name here...'
-        self.fields['code'].widget.attrs['placeholder'] = 'Enter Bank Code here...'
-        
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            Row(
-                Column('name', css_class='form-group col-md-6 mb-0'),
-                Column('code', css_class='form-group col-md-6 mb-0'),
-                css_class='form-row'
-            ),
-            'is_available',
-            Div(
-                Submit('save', 'Save Bank'), 
-                css_class='text-end'
-            )
-        )
+        super().__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs['placeholder'] = 'Enter bank name'
+        self.fields['code'].widget.attrs['placeholder'] = 'Enter bank code'
         
         
     class Meta:
@@ -67,14 +42,9 @@ class BankForm(forms.ModelForm):
 
 class LGAForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(LGAForm, self).__init__(*args, **kwargs)
-        self.fields['name'].widget.attrs['placeholder'] = 'Enter Local Goverment Area Name here...'
-
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            'name', 'code',
-            Div(Submit('save', 'Save LGA'), css_class='text-end')
-        )
+        super().__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs['placeholder'] = 'Enter Local Goverment Area name'
+        self.fields['code'].widget.attrs['placeholder'] = 'Enter Local Goverment Area code'
 
     class Meta:
         model = LGA

@@ -1,58 +1,32 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1 class="text-center text-primary">{{ scholarship.title }}</h1>
+    <h2 class="text-center text-success">
+        {{ scholarship.title }}
+        <a href="{% url 'scholarship:update' id=scholarship.id %}" class="btn btn-text">
+            <i class="bi bi-pencil"></i>
+        </a>
+    </h2>
     <p>{{ scholarship.description }}</p>
 
     <h3>Criteria:</h3>
     <ul>
-    {% for criterion in scholarship.criteria.all %}
+    {% for criterion in scholarship.criteria %}
         <li>{{ criterion }}</li>
     {% endfor %}
     </ul>
 
-    <h3>Requiremets:</h3>
-    <ul>
-    {% for requirement in scholarship.requirements.all %}
-        <li>{{ requirement }}</li>
-    {% endfor %}
-    </ul>
+    {% include 'layouts/table.html' with title='Application Documents' table_headers=table_headers %}
 
-    <h3>Targeted Programs:</h3>
-    <ul>
-    {% for program in scholarship.programs.all %}
-        <li class="d-flex justify-content-between">
-            <p>{{ program }}</p>
-            <p class="me-3">
-                <a href="{% url 'scholarship:update-program' id=program.id %}" class="btn btn-warning">
-                    <i class="bi bi-pencil"></i>
-                </a>
-                <a href="{% url 'scholarship:delete-program' id=program.id %}" class="btn btn-danger">
-                    <i class="bi bi-trash"></i>
-                </a>
-            </p>
-        </li>
+    <div class="text-end">
+        <div class="btn-group">
+            <a href="{% url 'scholarship:scholarship-applications' id=scholarship.id %}" class="btn btn-outline-primary">
+                Applications <i class="bi bi-files"></i>
+            </a>
     
-    {% empty %}
-        <li class="text-muted">Please add target program</li>
-    {% endfor %}
-    </ul>
-
-    <div class="btn-group">
-        <a href="{% url 'scholarship:update' id=scholarship.id %}" class="btn btn-outline-primary">
-            Update <i class="bi bi-pencil"></i>
-        </a>
-
-        <a href="{% url 'scholarship:add-program' id=scholarship.id %}" class="btn btn-outline-primary">
-            Program <i class="bi bi-plus"></i>
-        </a>
-
-        <a href="{% url 'scholarship:scholarship-applications' id=scholarship.id %}" class="btn btn-outline-primary">
-            Applications <i class="bi bi-files"></i>
-        </a>
-
-        <a href="{% url 'scholarship:scholarship-disbursement' id=scholarship.id %}" class="btn btn-outline-primary">
-            Disbursement <i class="bi bi-currency-dollar"></i>
-        </a>
+            <a href="{% url 'scholarship:scholarship-disbursement' id=scholarship.id %}" class="btn btn-outline-primary">
+                Disbursement <i class="amount"></i>
+            </a>
+        </div>
     </div>
 {% endblock %}

@@ -1,47 +1,24 @@
-{% extends 'base.html' %}
+{% for i in data %}
+<tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ i }}</td>
+    <td>{{ i.institution_type }}</td>
+    <td>
+        <div class="btn-group" hx-target="#dialog">
+            <a href="{{ i.update_url }}" hx-get="{{ i.update_url }}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i>
+            </a>
 
-{% block content %}
-    {% include "../parts/filter-form.html" with filter_label="Filter Academic Institutions" %}
-
-    <div class="d-flex justify-content-between align-items-center mt-5">
-        <h1>{{ header|default:'Institutions' }}</h1>
-
-        <a href="{% url 'academic:create-institution' %}" class="btn btn-success">
-            <i class="bi bi-plus"></i> Create
-        </a>
-    </div>
-
-    <div class="table-responsive mb-5">
-        <table class="table table-bordered table-hover table-striped">
-            <tr>
-                <th>S/N</th>
-                <th>Name</th>
-                <th>Actions</th>
-            </tr>
-            
-            {% for inst in institutions %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ inst.name }}</td>
-                <td>
-                    <div class="btn-group">
-                        <a href="{% url 'academic:update-institution' id=inst.id %}" class="btn btn-warning">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        
-                        <a href="{% url 'academic:delete-institution' id=inst.id %}" class="btn btn-danger">
-                            <i class="bi bi-trash"></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3" class="text-center text-muted">
-                    There is no available institution
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-{% endblock %}
+            <a href="{{ i.delete_url }}" hx-get="{{ i.delete_url }}" class="btn btn-danger">
+                <i class="bi bi-trash"></i>
+            </a>
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="4" class="text-center text-muted">
+        There is no available institution.
+    </td>
+</tr>
+{% endfor %}

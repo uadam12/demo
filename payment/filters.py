@@ -1,15 +1,33 @@
 import django_filters as df
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, Div, Submit
+from django import forms
+from crispy_forms.layout import Layout
+from app.filter import FilterDataSet
 from .models import Payment
 
-class PaymentFilter(df.FilterSet):
+class PaymentFilter(FilterDataSet):
+    rrr = df.CharFilter(
+        field_name='rrr', lookup_expr='icontains', label='',
+        widget=forms.TextInput({'placeholder': 'Search payment'})
+    )
+    
+    date_from = df.DateFilter(
+        label='From range',
+        field_name='paid_on', lookup_expr='gte',
+        widget=forms.DateInput({'type': 'date'})
+    )
+    
+    date_to = df.DateFilter(
+        label='To range',
+        field_name='paid_on', lookup_expr='lte',
+        widget=forms.DateInput({'type': 'date'})
+    )
+
     class Mete:
         model = Payment
-        fields = []
+        fields = ('rrr', )
 
     payment_type = df.ChoiceFilter(
-        field_name = 'code',
+        field_name = 'payment_type',
         label = 'Payment Type',
         empty_label = 'Select Payment Type',
         choices = Payment.TYPES
@@ -18,18 +36,9 @@ class PaymentFilter(df.FilterSet):
     @property
     def form(self):
         form = super().form
-        form.helper = FormHelper()
-        form.helper.form_method = 'get'
         form.helper.layout = Layout(
-            Row(
-                Column('payment_type', css_class='form-group col-md-9'),
-                Column(
-                    Div(
-                        Submit('', "Filter Payments"), css_class='text-end',
-                    ),
-                    css_class='form-group col-md-3 mb-0 align-self-end pb-3'
-                )
-            )
+            'payment_type', 'date_from', 'date_to',
+            self.search_field_with_btn('rrr')
         )
         
         return form

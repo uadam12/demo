@@ -4,8 +4,9 @@ from django.http import HttpResponse
 from app import render, is_post, get_or_none
 from app.auth import login_required, officials_only
 from app.pdf import generate_application_form
+from app.views import data_view
 from .models import Scholarship, Application
-from .filters import ApplicationFilter, DisbursementFilter
+from .filters import ApplicationFilter
 
 @officials_only()
 def applications(request):
@@ -16,59 +17,36 @@ def applications(request):
         title='Scholarship Applications',
         scholarships = scholarships
     )
-
-
-@officials_only()
-def scholarship_applications(request, id):
-    scholarship = get_object_or_404(Scholarship, id=id)
-    filter = ApplicationFilter(request.GET, queryset=scholarship.applications.all())
-    
-    return render(
-        request, 'scholarship/applications',
-        title='Scholarship Applications',
-        scholarship = scholarship,
-        applications = filter.qs,
-        form = filter.form
-    )
     
 @officials_only()
 def scholarship_applications(request, id):
     scholarship = get_object_or_404(Scholarship, id=id)
-    applications = scholarship.applications.exclude(disbursement_status='Paid').all()
-    
-    if is_post(request):
-        applications = applications.filter(status='approved').all()
-        
-        for application in applications:
-            application.disbursement_status='Paid'
-            application.save()
-        
-        messages.success(request, 'Applications disbursed successfully')
-
+    applications = scholarship.applications.all()
     filter = ApplicationFilter(request.GET, queryset=applications)
 
-    return render(
-        request, 'scholarship/applications',
-        title='Scholarship Applications',
-        scholarship = scholarship,
-        applications = filter.qs,
-        form = filter.form
+    return data_view(
+        request, filter.qs,
+        data_template='scholarship/applications.html',
+        table_headers=['S/N', 'Applicant name', 'Bank details', 'Action'],
+        title=f"{scholarship} Applications",
+        filter_form=filter.form
     )
+
 
 @officials_only()
 def scholarship_disbursements(request, id):
     scholarship = get_object_or_404(Scholarship, id=id)
-    filter = DisbursementFilter(
+    filter = ApplicationFilter(
         request.GET, 
-        queryset=scholarship.applications.filter(disbursement_status='Paid').all()
+        queryset=scholarship.applications.all()
     )
-
-    return render(
-        request, 'scholarship/disbursements',
-        title='Scholarship Disbursements',
-        scholarship = scholarship,
-        applications = filter.qs,
-        form = filter.form
+    
+    return data_view(
+        request, filter.qs,
+        data_template='scholarship/disbursements.html',
+        table_headers=['S/N', 'Applicant name', 'Bank details', 'Action'],
+        title=f"{scholarship} Disbursements",
+        filter_form=filter.form
     )
 
 def approve_application(request, id):

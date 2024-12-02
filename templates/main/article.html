@@ -6,22 +6,21 @@
 
     <div class="card-body">
         <h3 class="text-center">{{ article.headline }}</h3>
+        {{ article.content|linebreaks }}
 
-        {% for p in article.contents %}
-        <p>{{ p }}</p>
-        {% endfor %}
-
-        <p>
-            Published on:
+        <div class="row">
+            <div class="col-sm">
+                Published on:
             <small class="text-muted text-small">
-                {{ article.publish_on }}
+                {{ article.publish_on|date:'l d/m/Y @P' }}
             </small>
-        </p>
-        <p class="text-end">
-            <a href="{% url 'main:news' %}" class="btn btn-secondary">
-                <i class="fa fa-arrow-left"></i> News Home
-            </a>
-        </p>
+            </div>
+            <div class="col-sm text-end">
+                <a href="{{ article.list_url }}" class="btn btn-secondary">
+                    <i class="bi bi-newspaper"></i> Home
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock content %}

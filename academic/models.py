@@ -1,9 +1,19 @@
 from django.db import models
+from django.urls import reverse, reverse_lazy
 
 # Create your models here.
 class Program(models.Model):
     name = models.CharField(max_length=25, unique=True)
+    list_url = reverse_lazy('academic:programs')
+
+    @property
+    def update_url(self):
+        return reverse('academic:update-program', kwargs={'id':self.pk})
     
+    @property
+    def delete_url(self):
+        return reverse('academic:delete-program', kwargs={'id':self.pk})
+
     class Meta:
         verbose_name = "program"
         verbose_name_plural = "programs"
@@ -16,6 +26,15 @@ class Level(models.Model):
     name = models.CharField(max_length=20)
     code = models.PositiveIntegerField()
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='levels')
+    list_url = reverse_lazy('academic:levels')
+
+    @property
+    def update_url(self):
+        return reverse('academic:update-level', kwargs={'id':self.pk})
+    
+    @property
+    def delete_url(self):
+        return reverse('academic:delete-level', kwargs={'id':self.pk})
 
     class Meta:
         verbose_name = "level"
@@ -34,13 +53,31 @@ class Level(models.Model):
 
 class CourseType(models.Model):
     title = models.CharField(max_length=100, unique=True)
+    list_url = reverse_lazy('academic:course-types')
+
+    @property
+    def update_url(self):
+        return reverse('academic:update-course-type', kwargs={'id':self.pk})
     
+    @property
+    def delete_url(self):
+        return reverse('academic:delete-course-type', kwargs={'id':self.pk})
+
     def __str__(self) -> str:
         return self.title
 
 class Course(models.Model):
     title = models.CharField(max_length=100, unique=True)
     course_type = models.ForeignKey(CourseType, on_delete=models.CASCADE, related_name='courses')
+    list_url = reverse_lazy('academic:courses')
+
+    @property
+    def update_url(self):
+        return reverse('academic:update-course', kwargs={'id':self.pk})
+    
+    @property
+    def delete_url(self):
+        return reverse('academic:delete-course', kwargs={'id':self.pk})
 
     class Meta:
         verbose_name = "course"
@@ -52,6 +89,15 @@ class Course(models.Model):
 
 class InstitutionType(models.Model):
     name = models.CharField(max_length=150, unique=True)
+    list_url = reverse_lazy('academic:institution-types')
+
+    @property
+    def update_url(self):
+        return reverse('academic:update-institution-type', kwargs={'id':self.pk})
+    
+    @property
+    def delete_url(self):
+        return reverse('academic:delete-institution-type', kwargs={'id':self.pk})
     
     class Meta:
         verbose_name = "institution_type"
@@ -68,6 +114,15 @@ class Institution(models.Model):
         on_delete=models.CASCADE, 
         related_name='institutions'
     )
+    list_url = reverse_lazy('academic:institutions')
+
+    @property
+    def update_url(self):
+        return reverse('academic:update-institution', kwargs={'id':self.pk})
+    
+    @property
+    def delete_url(self):
+        return reverse('academic:delete-institution', kwargs={'id':self.pk})
  
     class Meta:
         verbose_name = "institution"
