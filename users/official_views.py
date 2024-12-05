@@ -19,7 +19,7 @@ def dashboard(request):
         request, 'officials/dashboard', 
         title='BSSB Official Dashboard',
         total_blocked_users = officials.count(),
-        total_open_scholarships = Scholarship.open_scholarships().count(),
+        total_open_scholarships = Scholarship.objects.count(),
         total_scholarships = Scholarship.objects.count(),
         total_applicants = applicants.count(),
         total_users = applicants.count() + officials.count(),
@@ -71,7 +71,7 @@ def update_official(request, id):
 @officials_only()
 def applicants(request):
     filter = ApplicantFilter(request.GET, queryset=User.objects.filter(access_code__in=[0,1]))
-    
+
     return data_view(
         request, data=filter.qs,
         filter_form = filter.form,

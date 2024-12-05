@@ -15,8 +15,8 @@ class OfficalFilter(FilterDataSet):
         fields = []
     
     official_type = df.ChoiceFilter(
-        widget=forms.RadioSelect(), empty_label='Both', 
         field_name='access_code', method='filter_official_type',
+        widget=forms.RadioSelect(), empty_label='Both', label='',
         choices = [('guest', 'Guest'), ('admin', 'Administrator')]
     )
 

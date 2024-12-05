@@ -5,9 +5,19 @@
     <td>{{ scholarship.application_commence }}</td>
     <td>{{ scholarship.application_deadline }}</td>
     <td>
-        <a href="{% url 'scholarship:scholarship' id=scholarship.id %}" class="btn btn-primary">
-            <i class="bi bi-eye"></i>
-        </a>
+        <div class="btn-group"  hx-target="#dialog">
+            <a href="{{ scholarship.url }}" class="btn btn-primary">
+                <i class="bi bi-eye"></i>
+            </a>
+            
+            <a href="{{ scholarship.update_url }}" hx-get="{{ scholarship.update_url }}" class="btn btn-warning">
+                <i class="bi bi-pen"></i>
+            </a>
+
+            <a href="{{ scholarship.delete_url }}" hx-get="{{ scholarship.delete_url }}" class="btn btn-danger">
+                <i class="bi bi-trash"></i>
+            </a>
+        </div>
     </td>
 </tr>
 {% empty %}

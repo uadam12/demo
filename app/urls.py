@@ -25,6 +25,7 @@ urlpatterns = [
     path('user/', include('users.urls')),
     path('validate/', include('app.validation_urls')),
     path('board/', include('board.urls')),
+    path('support/', include('support.urls')),
     path('payment/', include('payment.urls')),
     path('academic/', include('academic.urls')),
     path('applicant/', include('applicant.urls')),

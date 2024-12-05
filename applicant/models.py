@@ -1,9 +1,9 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from app.validators import validate_phone_number
 from users.models import User
 from board.models import LGA, Bank
-from payment.models import Payment
 from academic.models import InstitutionType, Institution, Program, Level, CourseType, Course
 
 # Create your models here.
@@ -72,6 +72,15 @@ class SchoolAttended(models.Model):
     year_to = models.PositiveSmallIntegerField(default=2024)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='schools_attended')
     
+    def clean(self) -> None:
+        if self.year_from >= self.year_to:
+            raise ValidationError({
+                'year_from': 'Invalid from date.',
+                'year_to': 'Invalid to date.',
+            })
+
+        return super().clean()
+    
     @property
     def info(self):
         return (
@@ -79,7 +88,6 @@ class SchoolAttended(models.Model):
             str(self.year_from), str(self.year_to)
         )
 
-    
     def __str__(self):
         return f"{self.school_name} | {self.year_from} - {self.year_to}"
 

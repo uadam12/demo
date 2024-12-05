@@ -1,6 +1,9 @@
+from os import path
 from django.db import models
 from django.urls import reverse
+from django.conf import settings
 from django.utils import timezone
+from django.templatetags.static import static
 from django.contrib.auth.models import AbstractUser
 from board.models import RegistrationDocument
 from payment.models import Payment
@@ -32,6 +35,14 @@ class User(AbstractUser):
     objects = BSSBManager()
     
     @property
+    def avatar(self):
+        file = path.join(settings.MEDIA_ROOT, self.picture.name)
+        if self.picture and path.isfile(file):
+            return self.picture.url
+        
+        return static('imgs/default-user.svg')
+    
+    @property
     def registration_documents(self):
         reg_docs = RegistrationDocument.objects.all()
         
@@ -45,7 +56,7 @@ class User(AbstractUser):
     def profile_error_messages(self) -> list:
         profile_errors = []
         error_messages = {
-            #'personal_info': 'Please update your personal information.',
+            'personal_info': 'Please update your personal information.',
             'academic_info': 'Please add your current academic information.',
             'account_bank': 'Please add your account bank details.',
             'schools_attended': 'Please add school(s) you attended before.',
@@ -72,7 +83,10 @@ class User(AbstractUser):
         return reverse(viewname)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        name = f"{self.first_name} {self.last_name}"
+        name = name.strip()
+        
+        return name if name else self.email
 
 
 class Document(models.Model):

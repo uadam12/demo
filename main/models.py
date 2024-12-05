@@ -105,6 +105,8 @@ class Notification(models.Model):
     def delete_url(self):
         return reverse('main:delete-notification', kwargs={'id':self.pk})
 
-
     def __str__(self) -> str:
         return self.message[:50]
+    
+    class Meta:
+        ordering = ['-notified_at', 'message']

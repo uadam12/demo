@@ -4,9 +4,15 @@ from django.http import HttpResponse
 from django.urls import reverse_lazy
 from . import render, is_post, is_htmx
 
+def trigger(response:HttpResponse, event:str):
+    response.headers['HX-Trigger'] = event
+
 def htmx_empty_response(data_change):
     response = HttpResponse(status=204)
-    if data_change: response.headers['HX-Trigger'] = 'dataChanged'
+
+    if data_change: 
+        trigger(response, 'dataChanged')
+    
     return response
 
 def data_view(request, data, data_template, title, table_headers=[], add_url=None, main_template='data', filter_form=None):

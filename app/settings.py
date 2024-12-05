@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-k=qb^4e*jji6+p2p1!jpxnz=pz92+h@(ihw78-sf3#4vt*j0u5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = not False
 ALLOWED_HOSTS = ['usimam12.pythonanywhere.com', 'localhost']
 
 
@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_filters', 'crispy_forms', 'crispy_bootstrap5',
-    'board', 'payment', 'users', 'main',
+    'board', 'payment', 'users', 'main', 'support',
     'academic', 'scholarship', 'applicant',
 ]
 

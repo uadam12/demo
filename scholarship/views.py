@@ -99,9 +99,8 @@ def update_scholarship(request, id):
     return update_view(
         request, 
         instance=scholarship,
-        header=f'Update {scholarship}',
-        form_class=ScholarshipForm, 
-        success_url=reverse('scholarship:scholarship', kwargs={'id': id})
+        form_header=f'Update {scholarship}',
+        form_class=ScholarshipForm
     )
     
 @officials_only(main_admin_only=True)

@@ -6,7 +6,7 @@
     {% load crispy_forms_tags %}
 
     <div class="card-header">
-        <h3 class="card-title text-center text-secondary">Welcome Back</h3>
+        <h3 class="card-title text-success">Welcome Back</h3>
     </div>
 
     <div class="card-body">
@@ -20,9 +20,15 @@
     </div>
 
     <div class="card-footer">
-        <div class="d-grid">
-            <button class="btn btn-primary">
-                <i class="bi bi-box-arrow-in-right"></i> Login
+        <div class="text-end">
+            <a href="{% url 'user:register' %}" class="btn btn-success">
+                <i class="bi bi-person-plus"></i>
+                Create an account
+            </a>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-box-arrow-in-right"></i>
+                Login
             </button>
         </div>
     </div>

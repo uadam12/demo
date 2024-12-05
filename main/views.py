@@ -1,10 +1,12 @@
 from django.core.paginator import Paginator
+from django.utils import timezone
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib import messages
 from board.models import Board
 from app import render, is_post
 from app.auth import login_required
+from app.context_processors import get_notifications
 from app.views import create_view, update_view, delete_view, data_view
 from .models import FAQ, Article, Notification, Contact
 from .forms import FAQForm, ArticleForm, ContactForm, NotificationForm
@@ -116,6 +118,19 @@ def contact_us(request):
     else:form = ContactForm()
     
     return render(request, 'main/contact', form=form)
+
+def all_notifications(request):
+    if is_post(request):
+        if request.user.is_authenticated:
+            request.user.last_time_read_notifications = timezone.now()
+            request.user.save()
+            messages.success(request, 'Mark as read successfully.')
+            return redirect(request.path)
+
+    return render(
+        request, 'main/all-notifications', 'All Notifications',
+        data = get_notifications(request.user)
+    )
 
 def reply(request, contact_id):
     contact = get_object_or_404(Contact, id=contact_id)

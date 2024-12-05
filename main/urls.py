@@ -21,6 +21,7 @@ urlpatterns = [
     # Contacts and Notifications
     path('contacts/', views.contacts, name='contacts'),
     path('notifications/', views.notifications, name='notifications'),
+    path('notifications/all', views.all_notifications, name='all-notifications'),
     path('notifications/create/', views.create_notification, name='create-notification'),
     path('notifications/<int:id>/update/', views.update_notification, name='update-notification'),
     path('notifications/<int:id>/delete/', views.delete_notification, name='delete-notification'),

@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.http import HttpResponse
 from django.contrib import messages
 from django.http import HttpResponse
+from django.db.models import Q
 from applicant.models import Referee
 from users.forms import ProfilePictureForm
 from app import is_post, get_or_none, render, render_form
@@ -200,12 +201,13 @@ def referees(request):
 
 @applicant_only
 def scholarships(request):
+    program = request.user.academic_info.program
+    course_of_study = request.user.academic_info.course_of_study
     applications = Application.objects.filter(applicant = request.user).prefetch_related('scholarship')
-    applied_scholarships = []
-    for app in applications:
-        applied_scholarships.append(app.scholarship.id)
-        
-    scholarships = Scholarship.objects.exclude(pk__in=applied_scholarships).all()
+    scholarships = Scholarship.objects.filter(
+        Q(programs=program) & Q(target_courses=course_of_study)
+    ).exclude(application__applicant=request.user)
+    print(scholarships)
     
     return render(
         request, 'applicants/scholarships', 

@@ -1,17 +1,16 @@
 from django.db.models import Q
-from django.utils import timezone
 from django.http import HttpRequest
 from main.models import Notification
 
-
-def notifications(request:HttpRequest):
-    user = request.user
-
+def get_notifications(user, limit:int=0):
     if not user.is_authenticated:
+        notifications = Notification.objects.filter(visibility='public')
+        if limit: notifications = notifications[:limit]
+        
         messages = [{
             'message': notification.message,
             'read': True
-        } for notification in Notification.objects.filter(visibility='public')]
+        } for notification in notifications]
 
         return {
             'notification': {
@@ -21,31 +20,30 @@ def notifications(request:HttpRequest):
         }
     
     messages, unread = [], 0
-    there_is_unread_notification = False
     notifications = Notification.objects.filter(
-        Q(visibility__in=['public', 'memebers']) |
+        Q(visibility__in=['public', 'members']) |
         Q(visibility='selected', users=user)
     ).distinct()
     
     for notification in notifications:
-        read = user.is_authenticated and user.last_time_read_notifications > notification.notified_at
+        read = user.last_time_read_notifications > notification.notified_at
 
         if not read:
             unread += 1
-            there_is_unread_notification = True
 
         messages.append({
             'message': notification.message,
             'read': read
         })
+        
+    if limit: messages = messages[:5]
 
-    if there_is_unread_notification and user.is_authenticated:
-        user.last_time_read_notifications = timezone.now()
-        user.save()
-    
     return {
         'notification': {
             'unread': unread,
             'messages': messages
         }
     }
+
+def notifications(request:HttpRequest):
+    return get_notifications(request.user, 5)

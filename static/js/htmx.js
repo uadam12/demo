@@ -36,11 +36,3 @@ document.addEventListener("htmx:beforeRequest", () => {
 document.addEventListener("htmx:afterRequest", () => {
     requestIndicator.classList.remove('show');
 });
-
-/**
- * // Show all existsing toasts, except the template
-    htmx.findAll(".toast:not([data-toast-template])").forEach((element) => {
-        const toast = new bootstrap.Toast(element, toastOptions)
-        toast.show()
-    })
- */

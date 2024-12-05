@@ -6,6 +6,7 @@ from app import render, is_post
 from app.views import update_view
 from app.token import verify_token
 from app.auth import login_required, logout_required, blocked_required
+from board.models import Board
 from .forms import RegisterForm, LoginForm, EmailForm, UserForm, ProfilePictureForm, ResetPasswordForm
 from .emails import send_activation_email, send_recovery_email
 
@@ -33,6 +34,10 @@ def update_name(request):
 
 @logout_required
 def register(request):
+    board = Board.load()
+    
+    if not board.registration_is_open:
+        return render(request, 'users/registration-closed', "Registration closed")
     form = RegisterForm
     
     if is_post(request):

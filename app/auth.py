@@ -14,11 +14,17 @@ def unauthorized_response(request, url):
 def login_required(view):
     @wraps(view)
     def wrapper(request, *args, **kwargs):
-        if not request.user.is_authenticated:
+        user = request.user
+
+        if not user.is_authenticated:
             messages.info(request, 'You need to login to access this page.')
             return unauthorized_response(request, 'user:login')
+        
+        if user.is_blocked:
+            messages.error(request, 'Looks like your account is blocked.')
+            return unauthorized_response(request, 'user:block')
 
-        if not request.user.is_active:
+        if not user.is_active:
             messages.info(request, 'You need to activate your to access this page.')
             return unauthorized_response(request, 'user:activation')
         
@@ -61,10 +67,6 @@ def applicant_only(view):
     @login_required
     def wrapper(request, *args, **kwargs):
         user = request.user
-
-        if user.access_code == 0:
-            messages.error(request, 'Looks like your account is blocked.')
-            return unauthorized_response(request, 'user:block')
 
         if user.access_code != 1:
             messages.info(request, 'This page is only accessible to applicants.')

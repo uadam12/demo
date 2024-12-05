@@ -1,7 +1,6 @@
 import random, string
-from datetime import datetime
 from django.db import models
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.core.exceptions import ValidationError
 from board.models import Bank
 from academic.models import Program, Institution, Level, Course
@@ -16,13 +15,26 @@ class Scholarship(models.Model):
     description = models.TextField()
     status = models.BooleanField(default=True)
     application_fee = models.DecimalField(max_digits=6, decimal_places=2)
-    program = models.ForeignKey(Program, on_delete=models.RESTRICT, related_name='scholarships')
-    disbursement_amount = models.DecimalField(max_digits=10, decimal_places=2, default=50_000.00)
+    programs = models.ManyToManyField(Program, related_name='scholarships')
+    target_courses = models.ManyToManyField(Course, related_name='scholarships')
     application_commence = models.DateTimeField()
     application_deadline = models.DateTimeField()
     eligibility_criteria = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    list_url = reverse_lazy('scholarship:index')
+    
+    @property
+    def url(self):
+        return reverse('scholarship:scholarship', kwargs={'id':self.pk})
+
+    @property
+    def update_url(self):
+        return reverse('scholarship:update', kwargs={'id':self.pk})
+    
+    @property
+    def delete_url(self):
+        return reverse('scholarship:delete', kwargs={'id':self.pk})
     
     @property
     def applications(self):
@@ -45,27 +57,11 @@ class Scholarship(models.Model):
         self.clean()
         return super().save(*args, **kwargs)
 
-    @property
-    def application_is_open(self):
-        return self.application_commence <= datetime.now() <= self.application_deadline
-
     def __str__(self) -> str:
         return self.title
     
-    @classmethod
-    def past_scholarships(cls):
-        return cls.objects.filter(application_deadline__lt = datetime.now())
-    
-    @classmethod
-    def upcoming_scholarships(cls):
-        return cls.objects.filter(application_commence__gt = datetime.now())
-    
-    @classmethod
-    def open_scholarships(cls):
-        return cls.objects.filter(
-            application_commence__lt = datetime.now(), 
-            application_deadline__gt = datetime.now()
-        )
+    class Meta:
+        ordering = ['-created_at']
 
 class ApplicationDocument(models.Model):
     name = models.CharField(max_length=255)
@@ -85,6 +81,7 @@ class ApplicationDocument(models.Model):
 
 class Application(models.Model):
     STATUS = (
+        ('paid', 'Paid'),
         ('pending', 'Pending'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
@@ -142,9 +139,9 @@ class Application(models.Model):
         return schools
 
     @classmethod
-    def get_or_create(cls, applicant, scholarship):
+    def get_or_create(cls, applicant:User, scholarship):
         try:
-            model = cls.objects.filter(applicant=applicant, scholarship=scholarship).get()
+            model:Application = cls.objects.filter(applicant=applicant, scholarship=scholarship).get()
         except cls.DoesNotExist:
             model = cls(applicant=applicant, scholarship=scholarship)
             model.applicant = applicant
