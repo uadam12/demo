@@ -5,15 +5,10 @@ from ..data.banks import banks
 from ..data.lgas import lgas
 from ..data.faqs import faqs
 from ..data.articles import articles
-from ..data.field_of_study import field_of_study
 
 from board.models import Bank, LGA
 from main.models import Article, FAQ
-from academic.models import (
-    InstitutionType, Institution,
-    CourseType, Course, 
-    Program, Level,    
-)
+from academic.models import InstitutionType, Institution, Course, Program, Level
 
 
 class Command(BaseCommand):
@@ -45,29 +40,27 @@ class Command(BaseCommand):
         program_names = [program.name for program in Program.objects.all()]
         for name in programs:
             if name in program_names: continue
-            
             program = Program.objects.create(name=name)
-            levels = programs[name]
 
+            levels = programs[name]['levels']
             for level in levels:
                 Level.objects.create(program=program, **level)
-
-
-        # Add Course type and courses
-        for course_type in field_of_study:
-            c_type, _ = CourseType.objects.get_or_create(title=course_type)
-            
-            for title in field_of_study[course_type]:
+        
+            courses = programs[name]['courses']
+            for course in courses:
                 try:
-                    Course.objects.get_or_create(title=title, course_type=c_type)
+                    Course.objects.get_or_create(title=course, program=program)
                 except Exception as e:
                     print(e)
-
+                    
                 
         for ins_type in institutions_by_type:
             i_type = InstitutionType.objects.create(name=ins_type)
             
             for inst in institutions_by_type[ins_type]:
-                Institution.objects.create(institution_type=i_type, name=inst)
+                try:
+                    Institution.objects.create(institution_type=i_type, name=inst)
+                except Exception as e:
+                    print(e)
 
         print('Database populated successfully!!!')

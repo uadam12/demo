@@ -1,7 +1,7 @@
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Div, Submit
-from .models import InstitutionType, Institution, Program, CourseType, Course, Level
+from .models import InstitutionType, Institution, Program, Course, Level
 
  
 class InstitutionTypeForm(forms.ModelForm):
@@ -58,39 +58,18 @@ class LevelForm(forms.ModelForm):
         self.fields['name'].widget.attrs['placeholder'] = 'Enter Level Name'
         self.fields['code'].widget.attrs['placeholder'] = 'Enter Level Code'
         self.fields['program'].empty_label = 'Select Program'
-
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            'program',
-            Row(
-                Column('name', css_class='form-group col-md-6 mb-0'),
-                Column('code', css_class='form-group col-md-6 mb-0'),
-                css_class='form-row'
-            ),
-            Div(
-                Submit('save', "Save Academic Level"),
-                css_class='text-end'
-            )
-        )
     
     class Meta:
         model = Level
         fields = ("name", "code", "program")
 
 
-class CourseTypeForm(forms.ModelForm):
-    
-    class Meta:
-        model = CourseType
-        fields = ("title", )
-
 class CourseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
         self.fields['title'].widget.attrs['placeholder'] = 'Enter Course Title'
-        self.fields['course_type'].empty_label = 'Select Course Type'
-        
-        
+        self.fields['program'].empty_label = 'Select program'
+
     class Meta:
         model = Course
-        fields = ("title", "course_type")
+        fields = ("title", "program")

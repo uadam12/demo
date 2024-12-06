@@ -24,13 +24,6 @@ urlpatterns = [
     path('programs/<int:id>/update/', views.update_program, name='update-program'),
     path('programs/<int:id>/delete/', views.delete_program, name='delete-program'),
     
-    # Course Types
-    path('course-types/', views.course_types, name='course-types'),
-    path('course-type/', views.course_type, name='course-type'),
-    path('course-types/create/', views.create_course_type, name='create-course-type'),
-    path('course-types/<int:id>/update/', views.update_course_type, name='update-course-type'),
-    path('course-types/<int:id>/delete/', views.delete_course_type, name='delete-course-type'),
-    
     # Courses
     path('courses/', views.courses, name='courses'),
     path('courses/create/', views.create_course, name='create-course'),

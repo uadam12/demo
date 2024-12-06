@@ -5,12 +5,11 @@ from app.views import update_view, delete_view, create_view, data_view
 from app.auth import officials_only
 from .filters import (
     CourseFilter, LevelFilter, InstitutionFilter, 
-    ProgramFilter, InstitutionTypeFilter, CourseTypeFilter
+    ProgramFilter, InstitutionTypeFilter
 )
 from .forms import (
     InstitutionType, InstitutionTypeForm,
     Institution, InstitutionForm,
-    CourseType, CourseTypeForm,
     Program, ProgramForm,
     Course, CourseForm,
     Level, LevelForm
@@ -147,56 +146,6 @@ def delete_program(request, id):
     program = get_object_or_404(Program, id=id)
     return delete_view(request, model=program, header='Delete Program')
 
-# Course types
-@officials_only()
-def course_types(request):
-    filter = CourseTypeFilter(request.GET, queryset=CourseType.objects.all())
-
-    return data_view(
-        request, title='Course Types',
-        data_template="academic/course-types.html",
-        data=filter.qs, add_url=reverse('academic:create-course-type'),
-        table_headers=['S/N', 'Title', 'Action'], filter_form=filter.form,
-    )
-
-def course_type(request):
-    id = request.GET.get('course_type')
-    
-    if not id:
-        return render(request, 'parts/options', data = Course.objects.none(), empty_label=f'Select your course type')
-
-    program = get_object_or_404(CourseType, id=id)
-    courses = program.courses.all()
-    
-    return render(request, 'parts/options', data = courses, empty_label='Select your course of study')
-
-@officials_only(admin_only=True)
-def create_course_type(request):
-    return create_view(
-        request, form_class=CourseTypeForm, 
-        success_url='academic:course-types', 
-        form_header='Create Course Type'
-    )
-
-@officials_only(admin_only=True)
-def update_course_type(request, id):
-    course_type = get_object_or_404(CourseType, id=id)
-    
-    return update_view(
-        request, instance=course_type, 
-        form_class=CourseTypeForm, 
-        form_header='Update Course Type'
-    )
-
-@officials_only(admin_only=True)
-def delete_course_type(request, id):
-    course_type = get_object_or_404(CourseType, id=id)
-    
-    return delete_view(
-        request, model=course_type,
-        header='Delete Course Type'
-    )
-
 # Courses
 @officials_only()
 def courses(request):
@@ -206,8 +155,8 @@ def courses(request):
         filter_form = filter.form,
         data_template="academic/courses.html",
         add_url=reverse('academic:create-course'),
-        data=filter.qs.prefetch_related('course_type'), 
-        table_headers=['S/N', 'Title', 'Type', 'Action']
+        data=filter.qs.prefetch_related('program'), 
+        table_headers=['S/N', 'Title', 'Program', 'Action']
     )
 
 @officials_only(admin_only=True)

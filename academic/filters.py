@@ -2,7 +2,7 @@ import django_filters as df
 from django import forms
 from crispy_forms.layout import Layout
 from app.filter import FilterDataSet
-from .models import Course, CourseType, Program, Level, Institution, InstitutionType
+from .models import Course, Program, Level, Institution, InstitutionType
 
 
 class SearchFilter(FilterDataSet):
@@ -24,17 +24,6 @@ class InstitutionTypeFilter(SearchFilter):
         model = InstitutionType
         fields = ['name']
 
-class CourseTypeFilter(SearchFilter):
-    name = df.CharFilter(
-        'title', lookup_expr='icontains', 
-        label='', widget = forms.TextInput(attrs={
-            'placeholder': 'Search by Name'
-        })
-    )
-
-    class Mete:
-        model = CourseType
-        fields = []
 
 class ProgramFilter(SearchFilter):
     class Mete:
@@ -79,16 +68,14 @@ class LevelFilter(FilterDataSet):
     name = df.CharFilter(
         'name', lookup_expr='icontains', 
         label='', widget = forms.TextInput(attrs={
-            'placeholder': 'Search Institution'
+            'placeholder': 'Search Level by name'
         })
     )
 
     program = df.ModelMultipleChoiceFilter(
         field_name = 'program',
         queryset = Program.objects.all(),
-        label = '', widget = forms.CheckboxSelectMultiple(attrs={
-            'placeholder': 'Search Program'
-        })
+        label = '', widget = forms.CheckboxSelectMultiple()
     )
     
     @property
@@ -101,24 +88,29 @@ class LevelFilter(FilterDataSet):
         
         return form
 
-class CourseFilter(CourseTypeFilter):
+class CourseFilter(SearchFilter):
+    name = df.CharFilter(
+        'title', lookup_expr='icontains', 
+        label='', widget = forms.TextInput(attrs={
+            'placeholder': 'Search by Name'
+        })
+    )
+    
+    program = df.ModelMultipleChoiceFilter(
+        field_name = 'program',
+        queryset = Program.objects.all(),
+        label = '', widget = forms.CheckboxSelectMultiple()
+    )
+
     class Mete:
         model = Course
         fields = []
-
-    course_type = df.ModelMultipleChoiceFilter(
-        field_name = 'course_type',
-        queryset = CourseType.objects.all(),
-        label = '', widget = forms.CheckboxSelectMultiple(attrs={
-            'placeholder': 'Search Institution'
-        })
-    )
     
     @property
     def form(self):
         form = super().form
         form.helper.layout = Layout(
-            'course_type', self.search_field_with_btn('name')
+            'program', self.search_field_with_btn('name')
         )
         
         return form

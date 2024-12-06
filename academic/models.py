@@ -3,7 +3,7 @@ from django.urls import reverse, reverse_lazy
 
 # Create your models here.
 class Program(models.Model):
-    name = models.CharField(max_length=25, unique=True)
+    name = models.CharField(max_length=100, unique=True)
     list_url = reverse_lazy('academic:programs')
 
     @property
@@ -23,7 +23,7 @@ class Program(models.Model):
         return self.name
     
 class Level(models.Model):
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=100)
     code = models.PositiveIntegerField()
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='levels')
     list_url = reverse_lazy('academic:levels')
@@ -51,24 +51,9 @@ class Level(models.Model):
         return f"{self.name} - {self.program.name}"
 
 
-class CourseType(models.Model):
-    title = models.CharField(max_length=100, unique=True)
-    list_url = reverse_lazy('academic:course-types')
-
-    @property
-    def update_url(self):
-        return reverse('academic:update-course-type', kwargs={'id':self.pk})
-    
-    @property
-    def delete_url(self):
-        return reverse('academic:delete-course-type', kwargs={'id':self.pk})
-
-    def __str__(self) -> str:
-        return self.title
-
 class Course(models.Model):
-    title = models.CharField(max_length=100, unique=True)
-    course_type = models.ForeignKey(CourseType, on_delete=models.CASCADE, related_name='courses')
+    title = models.CharField(max_length=255)
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='courses')
     list_url = reverse_lazy('academic:courses')
 
     @property
@@ -83,12 +68,18 @@ class Course(models.Model):
         verbose_name = "course"
         verbose_name_plural = "courses"
         ordering = ("title", )
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'program'],
+                name='unique_course_per_program',
+            )
+        ]
 
     def __str__(self):
         return self.title
 
 class InstitutionType(models.Model):
-    name = models.CharField(max_length=150, unique=True)
+    name = models.CharField(max_length=100, unique=True)
     list_url = reverse_lazy('academic:institution-types')
 
     @property
@@ -108,7 +99,7 @@ class InstitutionType(models.Model):
         return self.name
 
 class Institution(models.Model):
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=255)
     institution_type = models.ForeignKey(
         InstitutionType, 
         on_delete=models.CASCADE, 
