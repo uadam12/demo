@@ -17,7 +17,7 @@
             {% endfor %}
         </tr>
 
-        <tbody id="data" hx-trigger="load, dataChanged from:body"
+        <tbody id="data" hx-trigger="dataChanged from:body"
             hx-get="{{ data_url|default:request.path }}" hx-target="this">
             {% include data_template %}
         </tbody>

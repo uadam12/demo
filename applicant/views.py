@@ -203,11 +203,9 @@ def referees(request):
 def scholarships(request):
     program = request.user.academic_info.program
     course_of_study = request.user.academic_info.course_of_study
-    applications = Application.objects.filter(applicant = request.user).prefetch_related('scholarship')
     scholarships = Scholarship.objects.filter(
         Q(programs=program) & Q(target_courses=course_of_study)
     ).exclude(application__applicant=request.user)
-    print(scholarships)
     
     return render(
         request, 'applicants/scholarships', 

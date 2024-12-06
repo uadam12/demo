@@ -57,10 +57,9 @@ class AcademicInformationForm(forms.ModelForm):
         self.fields['id_number'].widget.attrs['placeholder'] = 'Enter your ID number'
         self.fields['institution_type'].empty_label = 'Select institution type'
         self.fields['institution'].empty_label = 'Please select institution type'
-        self.fields['program'].empty_label = 'Select program'
-        self.fields['course_type'].empty_label = 'Select course type'
-        self.fields['course_of_study'].empty_label = 'Please select course type'
-        self.fields['current_level'].empty_label = 'Please select program'
+        self.fields['program'].empty_label = 'Select your program'
+        self.fields['course_of_study'].empty_label = 'Select your course of study'
+        self.fields['current_level'].empty_label = 'Select your current level'
         
         self.helper = FormHelper()
         self.helper.attrs['hx-post'] = reverse('applicant:save-academic-info')
@@ -72,7 +71,7 @@ class AcademicInformationForm(forms.ModelForm):
                         hx_get = reverse('academic:institution-type'),
                         hx_trigger = 'change', hx_target='#id_institution'
                     ), 
-                    css_class='form-group col-md-6 mb-0',
+                    css_class='form-group col-md-6 mb-0'
                 ),
                 Column('institution', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
@@ -81,24 +80,17 @@ class AcademicInformationForm(forms.ModelForm):
                 Column(
                     Field('program', 
                         hx_get = reverse('academic:program'),
-                        hx_trigger = 'change', hx_target='#id_current_level'
-                    ), 
-                    css_class='form-group col-md-4 mb-0'
-                ),
-                Column('current_level', css_class='form-group col-md-4 mb-0'),
-                Column('id_number', css_class='form-group col-md-4 mb-0'),
-                css_class='form-row'
-            ),
-            Row(
-                Column(
-                    Field('course_type', 
-                        hx_get = reverse('academic:course-type'),
-                        hx_trigger = 'change', hx_target='#id_course_of_study'
+                        hx_trigger = 'change', hx_target='#field-of-study'
                     ), 
                     css_class='form-group col-md-6 mb-0'
                 ),
-                Column('course_of_study', css_class='form-group col-md-6 mb-0'),
+                Column('id_number', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
+            ),
+            Row(
+                Column('current_level', css_class='form-group col-md-6 mb-0'),
+                Column('course_of_study', css_class='form-group col-md-6 mb-0'),
+                css_class='form-row', css_id='field-of-study'
             ),
             Row(
                 Column('year_of_admission', css_class='form-group col-md-6 mb-0'),

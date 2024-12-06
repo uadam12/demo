@@ -120,9 +120,12 @@ def program(request):
         return render(request, 'parts/options', data = Level.objects.none(), empty_label=f'Select your program')
 
     program = get_object_or_404(Program, id=id)
-    levels = program.levels.all()
     
-    return render(request, 'parts/options', data = levels, empty_label='Select your current level')
+    return render(
+        request, 'parts/field-of-study', 
+        levels=Level.objects.filter(program=program), 
+        courses=Course.objects.filter(program=program)
+    )
 
 @officials_only(admin_only=True)
 def create_program(request):

@@ -39,7 +39,7 @@ class Level(models.Model):
     class Meta:
         verbose_name = "level"
         verbose_name_plural = "levels"
-        ordering = ("code", "name")
+        ordering = ("name", "code")
         constraints = [
             models.UniqueConstraint(
                 fields=['program', 'code'], 
@@ -118,7 +118,7 @@ class Institution(models.Model):
     class Meta:
         verbose_name = "institution"
         verbose_name_plural = "institutions"
-        ordering = ("name", )
+        ordering = ("name", "institution_type")
         
     def __str__(self):
         return self.name
