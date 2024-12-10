@@ -1,9 +1,10 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from app import render
+from app import render, is_post
 from app.views import delete_view, create_view, update_view, data_view
 from app.auth import officials_only
-from .models import ApplicationDocument
+from academic.models import Course, Program
+from .models import ApplicationDocument, Target
 from .forms import ScholarshipForm, Scholarship, ApplicationDocumentForm
 from .filters import FilterScholarship
 
@@ -25,32 +26,55 @@ def index(request):
         ]
     )
 
+@officials_only()
+def manage_courses(request, id):
+    target = get_object_or_404(Target, id=id)
+    courses = Course.objects.filter(program=target.program)
+    print(target.courses.values('id'))
+
+    if is_post(request):
+        selected_courses = request.POST.getlist('courses', [])
+        selected_courses = courses.filter(pk__in=selected_courses)
+        target.courses.set(selected_courses)
+        target.save()
+        return redirect(target.scholarship.url)
+
+    return render(
+        request, 'scholarship/courses',
+        title='Manage Courses',
+        target=target,
+        courses=courses
+    )
 
 @officials_only()
 def scholarship(request, id):
-    scholarship = get_object_or_404(Scholarship, id=id)
-    
+    scholarship:Scholarship = get_object_or_404(
+        Scholarship.objects.prefetch_related('programs'), id=id
+    )
+    programs = scholarship.get_programs.prefetch_related('courses')
+
     return render(
         request, 'scholarship/info',
-        scholarship = scholarship,
         title=f"{scholarship} details",
-        data_template='board/reg-documents.html',
         with_htmx=True, with_modal=True,
+        data_template='board/reg-documents.html',
+        scholarship = scholarship, programs = programs,
         table_headers=['S/N', 'Name', 'Is Compulsory', 'Actions'],
         data_url=reverse('scholarship:app-documents', kwargs={'id': id}),
-        add_url=reverse('scholarship:create-app-document', kwargs={'id': id})
+        data=ApplicationDocument.objects.filter(scholarship=scholarship).all(),
+        add_url=reverse('scholarship:create-app-document', kwargs={'id': id}),
     )
 
 # Application Documents
 def app_docuements(request, id):
     return data_view(
-        request, data=ApplicationDocument.objects.all(),
-        data_template='board/reg-documents.html',
+        request, data_template='board/reg-documents.html',
         table_headers=['S/N', 'Name', 'Is Compulsory', 'Actions'],
+        data=ApplicationDocument.objects.filter(scholarship_id=id).all(),
         add_url=reverse('scholarship:create-app-document', kwargs={'id': id}),
         title='Application Documents'
     )
-    
+
 def create_app_docuement(request, id):
     scholarship = get_object_or_404(Scholarship, id=id)
     

@@ -4,7 +4,6 @@ from ..data.programs import programs
 from ..data.banks import banks
 from ..data.lgas import lgas
 from ..data.faqs import faqs
-from ..data.articles import articles
 
 from board.models import Bank, LGA
 from main.models import Article, FAQ
@@ -15,15 +14,10 @@ class Command(BaseCommand):
     help = 'Populate data base with some data'
     
     def handle(self, *_, **__):
-        # Articles
+        # Frequently Asked Questions
         questions = [q.question for q in FAQ.objects.all()]
         faq_models = [FAQ(**faq) for faq in faqs if not faq['question'] in questions]
         FAQ.objects.bulk_create(faq_models)
-        
-        # Articles
-        headlines = [a.headline for a in Article.objects.all()]
-        article_models = [Article(**article) for article in articles if not article['headline'] in headlines]
-        Article.objects.bulk_create(article_models)
 
         # Add bank models
         available_banks = Bank.objects.all()
@@ -53,8 +47,10 @@ class Command(BaseCommand):
                 except Exception as e:
                     print(e)
                     
-                
+        # Add LGA models
+        available_inst_types = [inst_type.name for inst_type in InstitutionType.objects.all()]
         for ins_type in institutions_by_type:
+            if ins_type in available_inst_types: continue
             i_type = InstitutionType.objects.create(name=ins_type)
             
             for inst in institutions_by_type[ins_type]:

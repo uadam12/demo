@@ -1,11 +1,6 @@
 from django import forms
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, Submit, Div
-from crispy_forms.bootstrap import InlineCheckboxes
 from .models import Scholarship, ApplicationDocument
 
-class DateInput(forms.DateInput):
-    input_type = 'date'
 
 class ScholarshipForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -15,12 +10,12 @@ class ScholarshipForm(forms.ModelForm):
         self.fields['description'].widget.attrs['placeholder'] = 'Enter scholarship purpose, seperete paragraphs with new line'
         self.fields['eligibility_criteria'].widget.attrs['placeholder'] = 'Enter eligibility criteria, seperete paragraphs with new line'
         self.fields['application_fee'].widget.attrs['placeholder'] = 'Enter Scholarship Application FEE'
-        self.fields['application_commence'].widget = DateInput(attrs={
-            'required': True,
+        self.fields['application_commence'].widget = forms.DateInput(attrs={
+            'required': True, 'type': "date",
             'title': 'Select application commencement date'
         })
-        self.fields['application_deadline'].widget = DateInput(attrs={
-            'required': True,
+        self.fields['application_deadline'].widget = forms.DateInput(attrs={
+            'required': True, 'type': "date",
             'title': 'Select application deadline date'
         })
         
@@ -35,7 +30,7 @@ class ScholarshipForm(forms.ModelForm):
             "title", "application_fee", 
             "application_commence", "application_deadline", 
             "description", "eligibility_criteria",
-            "status", "programs", "target_courses",
+            "programs", "status"
         )
 
 

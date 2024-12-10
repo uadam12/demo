@@ -102,7 +102,7 @@ def news(request):
     return render(request, 'main/news', articles=articles)
 
 def about(request):
-    return render(request, 'main/about')
+    return render(request, 'main/about', abouts=Board().abouts)
 
 @login_required
 def contact_us(request):

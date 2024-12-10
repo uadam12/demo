@@ -1,26 +1,28 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% with unread=data.notification.unread notifications=data.notification.messages %}
 <div class="container mt-5">
+{% if notifications %}    
     <h2 class="text-center text-success mb-4">
         <i class="bi bi-bell"></i> All Notifications
-        {% with unread=data.notification.unread %}
-        {% if unread %}
+
+        {% if unread > 0 %}
         <span class="badge bg-danger">
             {{ unread }}
         </span>
         {% endif %}
-        {% endwith %}
+
     </h2>
 
     <ul class="list-group list-group-flush mb-2">
-    {% for notification in data.notification.messages %}
+    {% for notification in notifications %}
         <li class="list-group-item">
             {{ notification.message }}
         </li>
     {% endfor %}
-    </ul>
 
+    {% if unread > 0 %}
     <form action="" method="post">
         {% csrf_token %}
         <div class="text-end">
@@ -29,6 +31,11 @@
             </button>
         </div>
     </form>
-    
+    {% endif %}
+    </ul>
+{% else %}
+    <h2 class="text-center text-info">
+        <i class="bi bi-bell"></i> No available notification
+    </h2>
 </div>
-{% endblock %}
+{% endif %} {% endwith %} {% endblock %}

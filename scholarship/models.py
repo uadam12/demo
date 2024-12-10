@@ -15,8 +15,7 @@ class Scholarship(models.Model):
     description = models.TextField()
     status = models.BooleanField(default=True)
     application_fee = models.DecimalField(max_digits=6, decimal_places=2)
-    programs = models.ManyToManyField(Program, related_name='scholarships')
-    target_courses = models.ManyToManyField(Course, related_name='scholarships')
+    programs = models.ManyToManyField(Program, through='Target', related_name='scholarships')
     application_commence = models.DateTimeField()
     application_deadline = models.DateTimeField()
     eligibility_criteria = models.TextField()
@@ -27,6 +26,26 @@ class Scholarship(models.Model):
     @property
     def url(self):
         return reverse('scholarship:scholarship', kwargs={'id':self.pk})
+    
+    @property
+    def add_document_url(self):
+        return reverse('scholarship:create-app-document', kwargs={'id':self.pk})
+    
+    @property
+    def documents_url(self):
+        return reverse('scholarship:scholarship-documents', kwargs={'id':self.pk})
+    
+    @property
+    def add_program_url(self):
+        return reverse('scholarship:add-program', kwargs={'id':self.pk})
+    
+    @property
+    def applications_url(self):
+        return reverse('scholarship:scholarship-applications', kwargs={'id':self.pk})
+    
+    @property
+    def disbursement_url(self):
+        return reverse('scholarship:scholarship-disbursement', kwargs={'id':self.pk})
 
     @property
     def update_url(self):
@@ -40,6 +59,10 @@ class Scholarship(models.Model):
     def applications(self):
         return Application.objects.filter(scholarship=self)
     
+    @property
+    def get_programs(self):
+        return Target.objects.filter(scholarship=self)
+
     @property
     def criteria(self):
         criteria:str = self.eligibility_criteria
@@ -62,6 +85,19 @@ class Scholarship(models.Model):
     
     class Meta:
         ordering = ['-created_at']
+
+
+class Target(models.Model):
+    scholarship = models.ForeignKey(Scholarship, on_delete=models.CASCADE)
+    program = models.ForeignKey(Program, on_delete=models.CASCADE)
+    courses = models.ManyToManyField(Course, blank=True)
+
+    @property
+    def url(self):
+        return reverse('scholarship:courses', kwargs={'id':self.pk})
+    
+    def __str__(self):
+        return f"{self.scholarship}: {self.program}"
 
 class ApplicationDocument(models.Model):
     name = models.CharField(max_length=255)

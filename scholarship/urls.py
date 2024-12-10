@@ -12,6 +12,7 @@ urlpatterns = [
     path('<int:id>/add-program/', views.add_scholarship_program, name='add-program'),
     path('programs/<int:id>/update/', views.update_scholarship_program, name='update-program'),
     path('programs/<int:id>/delete/', views.delete_scholarship_program, name='delete-program'),
+    path('courses/<int:id>/', views.manage_courses, name='courses'),
     
     # Registration Documents
     path('app-documents/<int:id>/', views.app_docuements, name='app-documents'),

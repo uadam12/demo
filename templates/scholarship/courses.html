@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3 class="text-success text-center my-3">
+    Manage courses of {{ target }}
+</h3>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+        {% for course in courses %}
+        <div class="col">
+            <div class="form-check form-switch">
+                <input type="checkbox" 
+                    value="{{ course.id }}" 
+                    name="courses" id="course-{{ course.id }}"
+                    {% if course in target.courses.all %} selected {% endif %}
+                    class="form-check-input">
+                <label for="course-{{ course.id }}" class="form-check-input-label">{{ course }}</label>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-end">
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-save"></i> Save Courses
+        </button>
+    </div>
+</form>
+{% endblock %}

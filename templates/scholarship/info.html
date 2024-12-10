@@ -3,28 +3,61 @@
 {% block content %}
     <h2 class="text-center text-success">
         {{ scholarship.title }}
-        <a href="{% url 'scholarship:update' id=scholarship.id %}" class="btn btn-text">
+        <a href="{{ scholarship.update_url }}" hx-get="{{ scholarship.update_url }}" hx-target="#dialog" class="btn btn-text">
             <i class="bi bi-pencil"></i>
         </a>
     </h2>
     <p>{{ scholarship.description }}</p>
 
-    <h3>Criteria:</h3>
+    <h3 class="text-succss">Criteria:</h3>
     <ul>
     {% for criterion in scholarship.criteria %}
         <li>{{ criterion }}</li>
     {% endfor %}
     </ul>
 
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        {% for program in programs %}
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title">{{ program.program.name }}</h4>
+
+                        <a href="{{ program.url }}" 
+                            class="btn btn-secondary">
+                            <i class="bi bi-gear"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                {% if program.target_courses.exists %}
+                    <ul class="list-group list-group-flush">
+                        {% for course in program.target_courses.all %}
+                        <li class="list-group-item">{{ program.target_courses }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted text-center">
+                        All courses
+                    </p>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
     {% include 'layouts/table.html' with title='Application Documents' table_headers=table_headers %}
 
     <div class="text-end">
         <div class="btn-group">
-            <a href="{% url 'scholarship:scholarship-applications' id=scholarship.id %}" class="btn btn-outline-primary">
+            <a href="{{ scholarship.applications_url }}" class="btn btn-outline-primary">
                 Applications <i class="bi bi-files"></i>
             </a>
     
-            <a href="{% url 'scholarship:scholarship-disbursement' id=scholarship.id %}" class="btn btn-outline-primary">
+            <a href="{{ scholarship.disbursement_url }}" class="btn btn-outline-primary">
                 Disbursement <i class="amount"></i>
             </a>
         </div>
