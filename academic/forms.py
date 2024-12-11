@@ -1,7 +1,7 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, Div, Submit
-from .models import InstitutionType, Institution, Program, Course, Level
+from crispy_forms.layout import Layout, Div, Submit
+from .models import InstitutionType, Institution, Program, Course, Level, FieldOfStudy
 
  
 class InstitutionTypeForm(forms.ModelForm):
@@ -36,21 +36,23 @@ class InstitutionForm(forms.ModelForm):
 
 class ProgramForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(ProgramForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['name'].widget.attrs['placeholder'] = 'Enter Program Name'
-
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            'name',
-            Div(
-                Submit('save', "Save Program"),
-                css_class='text-end'
-            )
-        )
 
     class Meta:
         model = Program
         fields = ("name", )
+        
+class FieldOfStudyForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs['placeholder'] = 'Enter field of study name'
+        self.fields['program'].empty_label = 'Select program'
+        self.fields['number_of_years'].widget.attrs['placeholder'] = 'Enter number of years(eg 5 years for engineering)'
+
+    class Meta:
+        model = FieldOfStudy
+        fields = ("name", 'program', 'number_of_years')
 
 class LevelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -66,10 +68,10 @@ class LevelForm(forms.ModelForm):
 
 class CourseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(CourseForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['title'].widget.attrs['placeholder'] = 'Enter Course Title'
-        self.fields['program'].empty_label = 'Select program'
+        self.fields['field_of_study'].empty_label = 'Select field of study'
 
     class Meta:
         model = Course
-        fields = ("title", "program")
+        fields = ("title", "field_of_study")

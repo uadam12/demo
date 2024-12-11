@@ -58,6 +58,7 @@ class AcademicInformationForm(forms.ModelForm):
         self.fields['institution_type'].empty_label = 'Select institution type'
         self.fields['institution'].empty_label = 'Please select institution type'
         self.fields['program'].empty_label = 'Select your program'
+        self.fields['field_of_study'].empty_label = 'Select your field of study'
         self.fields['course_of_study'].empty_label = 'Select your course of study'
         self.fields['current_level'].empty_label = 'Select your current level'
         
@@ -65,8 +66,7 @@ class AcademicInformationForm(forms.ModelForm):
         self.helper.attrs['hx-post'] = reverse('applicant:save-academic-info')
         self.helper.attrs['hx-target'] = 'this'
         self.helper.layout = Layout(
-            Row(
-                Column(
+            Row(Column(
                     Field('institution_type', 
                         hx_get = reverse('academic:institution-type'),
                         hx_trigger = 'change', hx_target='#id_institution'
@@ -75,29 +75,21 @@ class AcademicInformationForm(forms.ModelForm):
                 ),
                 Column('institution', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
-            ),
-            Row(
-                Column(
-                    Field('program', 
-                        hx_get = reverse('academic:program'),
-                        hx_trigger = 'change', hx_target='#field-of-study'
-                    ), 
-                    css_class='form-group col-md-6 mb-0'
-                ),
-                Column('id_number', css_class='form-group col-md-6 mb-0'),
-                css_class='form-row'
-            ),
-            Row(
+            ), Field('program', 
+                hx_get = reverse('academic:program'),
+                hx_trigger = 'change', hx_target='#field-of-study'
+            ), Row(
                 Column('current_level', css_class='form-group col-md-6 mb-0'),
-                Column('course_of_study', css_class='form-group col-md-6 mb-0'),
+                Column('field_of_study', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row', css_id='field-of-study'
-            ),
-            Row(
+            ), Row(
+                Column('course_of_study', css_class='form-group col-md-6 mb-0'),
+                Column('id_number', css_class='form-group col-md-6 mb-0'), css_class='form-row'
+            ), Row(
                 Column('year_of_admission', css_class='form-group col-md-6 mb-0'),
                 Column('year_of_graduation', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
-            ),
-            Div(
+            ), Div(
                 Submit('save', 'Save Academic Information'),
                 css_class='text-end'
             )

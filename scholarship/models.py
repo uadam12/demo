@@ -2,8 +2,9 @@ import random, string
 from django.db import models
 from django.urls import reverse, reverse_lazy
 from django.core.exceptions import ValidationError
+from app import compress
 from board.models import Bank
-from academic.models import Program, Institution, Level, Course
+from academic.models import Program, Institution, Level, Course, FieldOfStudy
 from applicant.models import SchoolAttended
 from payment.models import Payment
 from users.models import User
@@ -15,7 +16,8 @@ class Scholarship(models.Model):
     description = models.TextField()
     status = models.BooleanField(default=True)
     application_fee = models.DecimalField(max_digits=6, decimal_places=2)
-    programs = models.ManyToManyField(Program, through='Target', related_name='scholarships')
+    field_of_studies = models.ManyToManyField(FieldOfStudy, related_name='scholarships')
+    exclusive = models.BooleanField(default=False)
     application_commence = models.DateTimeField()
     application_deadline = models.DateTimeField()
     eligibility_criteria = models.TextField()
@@ -60,10 +62,6 @@ class Scholarship(models.Model):
         return Application.objects.filter(scholarship=self)
     
     @property
-    def get_programs(self):
-        return Target.objects.filter(scholarship=self)
-
-    @property
     def criteria(self):
         criteria:str = self.eligibility_criteria
         return criteria.split('\n') if criteria else []
@@ -86,18 +84,6 @@ class Scholarship(models.Model):
     class Meta:
         ordering = ['-created_at']
 
-
-class Target(models.Model):
-    scholarship = models.ForeignKey(Scholarship, on_delete=models.CASCADE)
-    program = models.ForeignKey(Program, on_delete=models.CASCADE)
-    courses = models.ManyToManyField(Course, blank=True)
-
-    @property
-    def url(self):
-        return reverse('scholarship:courses', kwargs={'id':self.pk})
-    
-    def __str__(self):
-        return f"{self.scholarship}: {self.program}"
 
 class ApplicationDocument(models.Model):
     name = models.CharField(max_length=255)
@@ -133,6 +119,7 @@ class Application(models.Model):
     
     instituion = models.ForeignKey(Institution, on_delete=models.RESTRICT, related_name='applications')
     program = models.ForeignKey(Program, on_delete=models.RESTRICT, related_name='applications')
+    field_of_study = models.ForeignKey(FieldOfStudy, on_delete=models.RESTRICT, related_name='applications')
     course_of_study = models.ForeignKey(Course, on_delete=models.RESTRICT, related_name='applications')
     level = models.ForeignKey(Level, on_delete=models.RESTRICT, related_name='applications')
     id_number = models.CharField(max_length=50)
@@ -185,6 +172,7 @@ class Application(models.Model):
 
             academic = applicant.academic_info
             model.course_of_study = academic.course_of_study
+            model.field_of_study = academic.field_of_study
             model.instituion = academic.institution
             model.id_number = academic.id_number
             model.admission_year = academic.year_of_admission
@@ -207,8 +195,20 @@ class Application(models.Model):
             model = None
 
         return model
+    
+    def clean(self):
+        super().clean()
+        
+        applied_for_exclusive_scholarship = Application.objects.filter(
+            user=self.applicant, scholarship__exclusive=True
+        ).exists()
+        
+        if applied_for_exclusive_scholarship:
+            raise ValidationError('You cannot apply for another scholarship')
 
     def save(self, *args, **kwargs):
+        self.clean()
+
         while not self.application_id:
             id = 'BSSB'+''.join(
                 random.choices(string.digits, k=16)
@@ -219,13 +219,21 @@ class Application(models.Model):
                 self.application_id = id
             
         return super().save(*args, **kwargs)
+
     def __str__(self) -> str:
-        return f"Application by {self.applicant} for {self.scholarship.title}"
+        return f"Application of {self.applicant} for {self.scholarship.title}"
 
 class Document(models.Model):
     image = models.ImageField(upload_to='application_documents', null=True, blank=True)
     application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='documents')
     app_document = models.ForeignKey(ApplicationDocument, on_delete=models.CASCADE, related_name='documents')
+    
+    def save(self, *args, **kwargs):
+        try:
+            self.picture = compress(self.image)
+        except: pass
+        
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.app_document} of {self.application.applicant}"

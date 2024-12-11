@@ -5,10 +5,11 @@ from app.views import update_view, delete_view, create_view, data_view
 from app.auth import officials_only
 from .filters import (
     CourseFilter, LevelFilter, InstitutionFilter, 
-    ProgramFilter, InstitutionTypeFilter
+    FieldOfStudyFilter, ProgramFilter, InstitutionTypeFilter
 )
 from .forms import (
     InstitutionType, InstitutionTypeForm,
+    FieldOfStudy, FieldOfStudyForm,
     Institution, InstitutionForm,
     Program, ProgramForm,
     Course, CourseForm,
@@ -29,14 +30,11 @@ def institution_types(request):
 
 def institution_type(request):
     id = request.GET.get('institution_type')
-    
-    if not id:
-        return render(request, 'parts/options', data = Institution.objects.none(), empty_label=f'Select your institution type')
-    
-    institution_type = get_object_or_404(InstitutionType, id=id)
-    institutions = institution_type.institutions.all()
-    
-    return render(request, 'parts/options', data = institutions, empty_label=f'Select your {institution_type}')
+    return render(
+        request, 'parts/options', 
+        data=Institution.objects.filter(institution_type=id), 
+        empty_label=f'Select your institution'
+    )
 
 @officials_only(admin_only=True)
 def create_institution_type(request):
@@ -116,15 +114,10 @@ def programs(request):
 def program(request):
     id = request.GET.get('program')
 
-    if not id:
-        return render(request, 'parts/options', data = Level.objects.none(), empty_label=f'Select your program')
-
-    program = get_object_or_404(Program, id=id)
-    
     return render(
         request, 'parts/field-of-study', 
-        levels=Level.objects.filter(program=program), 
-        courses=Course.objects.filter(program=program)
+        levels=Level.objects.filter(program=id), 
+        field_of_studies=FieldOfStudy.objects.filter(program=id)
     )
 
 @officials_only(admin_only=True)
@@ -149,6 +142,51 @@ def delete_program(request, id):
     program = get_object_or_404(Program, id=id)
     return delete_view(request, model=program, header='Delete Program')
 
+
+# Field of studies
+@officials_only()
+def field_of_studies(request):
+    filter = FieldOfStudyFilter(request.GET, queryset=FieldOfStudy.objects.all())
+
+    return data_view(request, 
+        data_template="academic/field-of-studies.html",
+        title='Field of studies', filter_form=filter.form,
+        table_headers=['S/N', 'Name', 'Program', 'Action'],
+        data=filter.qs.prefetch_related('program'), 
+        add_url=reverse('academic:create-field-of-study')
+    )
+
+def field_of_study(request):
+    id = request.GET.get('field_of_study')
+
+    return render(
+        request, 'parts/options', empty_label=f'Select your course of study',
+        data=Course.objects.filter(field_of_study=id)
+    )
+
+@officials_only(admin_only=True)
+def create_field_of_study(request):
+    return create_view(
+        request, form_class=FieldOfStudyForm, 
+        success_url=FieldOfStudy.list_url,
+        form_header='Create field of study'
+    )
+
+@officials_only(admin_only=True)
+def update_field_of_study(request, id):
+    field_of_study = get_object_or_404(FieldOfStudy, id=id)
+    
+    return update_view(
+        request, instance=field_of_study, 
+        form_class=FieldOfStudyForm, 
+        form_header='Update field of study'
+    )
+
+@officials_only(admin_only=True)
+def delete_field_of_study(request, id):
+    field_of_study = get_object_or_404(FieldOfStudy, id=id)
+    return delete_view(request, model=field_of_study, header='Delete field of study')
+
 # Courses
 @officials_only()
 def courses(request):
@@ -158,8 +196,8 @@ def courses(request):
         filter_form = filter.form,
         data_template="academic/courses.html",
         add_url=reverse('academic:create-course'),
-        data=filter.qs.prefetch_related('program'), 
-        table_headers=['S/N', 'Title', 'Program', 'Action']
+        data=filter.qs.prefetch_related('field_of_study'), 
+        table_headers=['S/N', 'Title', 'Field of Study', 'Action']
     )
 
 @officials_only(admin_only=True)

@@ -22,15 +22,10 @@ class ScholarshipForm(forms.ModelForm):
         
     class Meta:
         model = Scholarship
-        widgets = {
-            'programs': forms.CheckboxSelectMultiple(),
-            'target_courses': forms.CheckboxSelectMultiple(),
-        }
         fields = (
             "title", "application_fee", 
             "application_commence", "application_deadline", 
-            "description", "eligibility_criteria",
-            "programs", "status"
+            "description", "eligibility_criteria", "status"
         )
 
 

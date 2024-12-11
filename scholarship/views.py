@@ -4,7 +4,7 @@ from app import render, is_post
 from app.views import delete_view, create_view, update_view, data_view
 from app.auth import officials_only
 from academic.models import Course, Program
-from .models import ApplicationDocument, Target
+from .models import ApplicationDocument
 from .forms import ScholarshipForm, Scholarship, ApplicationDocumentForm
 from .filters import FilterScholarship
 
@@ -27,22 +27,24 @@ def index(request):
     )
 
 @officials_only()
-def manage_courses(request, id):
-    target = get_object_or_404(Target, id=id)
-    courses = Course.objects.filter(program=target.program)
-    print(target.courses.values('id'))
+def manage_courses(request, scholarship_id, program_id):
+    scholarship = get_object_or_404(
+        Scholarship.objects.prefetch_related('programs', 'courses'), 
+        id=scholarship_id
+    )
+    program = get_object_or_404(scholarship.programs.all(), id=program_id)
+    courses = Course.objects.filter(program=program)
+    targeted_courses = scholarship.courses.all()
 
     if is_post(request):
         selected_courses = request.POST.getlist('courses', [])
         selected_courses = courses.filter(pk__in=selected_courses)
-        target.courses.set(selected_courses)
-        target.save()
-        return redirect(target.scholarship.url)
+        #return redirect(target.scholarship.url)
 
     return render(
         request, 'scholarship/courses',
         title='Manage Courses',
-        target=target,
+        #target=target,
         courses=courses
     )
 

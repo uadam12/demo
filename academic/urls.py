@@ -17,12 +17,19 @@ urlpatterns = [
     path('institutions/<int:id>/update/', views.update_institution, name='update-institution'),
     path('institutions/<int:id>/delete/', views.delete_institution, name='delete-institution'),
     
-    # Programs
+    # Programs 
     path('programs/', views.programs, name='programs'),
     path('program/', views.program, name='program'),
     path('programs/create/', views.create_program, name='create-program'),
     path('programs/<int:id>/update/', views.update_program, name='update-program'),
     path('programs/<int:id>/delete/', views.delete_program, name='delete-program'),
+    
+    # Field of studies
+    path('field-of-studies/', views.field_of_studies, name='field-of-studies'),
+    path('field-of-study/', views.field_of_study, name='field-of-study'),
+    path('field-of-studies/create/', views.create_field_of_study, name='create-field-of-study'),
+    path('field-of-studies/<int:id>/update/', views.update_field_of_study, name='update-field-of-study'),
+    path('field-of-studies/<int:id>/delete/', views.delete_field_of_study, name='delete-field-of-study'),
     
     # Courses
     path('courses/', views.courses, name='courses'),

@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 from app.validators import validate_phone_number
 from users.models import User
 from board.models import LGA, Bank
-from academic.models import InstitutionType, Institution, Program, Level, Course
+from academic.models import InstitutionType, Institution, Program, Level, FieldOfStudy, Course
 
 # Create your models here.
 class PersonalInformation(models.Model):
@@ -36,14 +36,15 @@ class PersonalInformation(models.Model):
         return f"Personal Informtion of {self.user}"
 
 class AcademicInformation(models.Model):
-    institution_type = models.ForeignKey(InstitutionType, on_delete=models.CASCADE, related_name='academic_info')
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='academic_info')
-    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='academic_info')
-    course_of_study = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='academic_info')
+    institution_type = models.ForeignKey(InstitutionType, on_delete=models.CASCADE, related_name='academic_infos')
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='academic_infos')
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='academic_infos')
+    field_of_study = models.ForeignKey(FieldOfStudy, on_delete=models.CASCADE, related_name='academic_infos')
+    course_of_study = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='academic_infos')
+    current_level = models.ForeignKey(Level, on_delete=models.CASCADE, related_name='academic_infos')
     year_of_admission = models.PositiveSmallIntegerField(default=2020)
     year_of_graduation = models.PositiveSmallIntegerField(default=2025)
     id_number = models.CharField(max_length=20)
-    current_level = models.ForeignKey(Level, on_delete=models.CASCADE, related_name='academic_info')
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='academic_info')
 
     class Meta:
@@ -108,4 +109,4 @@ class Referee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='referee')
 
     def __str__(self):
-        return f"{self.fullname} | Referee of {self.user}"
+        return f"{self.fullname} referee of {self.user}"

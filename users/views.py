@@ -32,6 +32,7 @@ def update_name(request):
         template='users/update-name'
     )
 
+# Auth
 @logout_required
 def register(request):
     board = Board.load()
@@ -80,7 +81,6 @@ def activate(request, token):
 def inactive(request):
     return render(request, 'users/inactive')
 
-# Create your views here.
 @logout_required
 def login(request):
     form = LoginForm()

@@ -2,7 +2,7 @@
 <tr>
     <td>{{ forloop.counter }}</td>
     <td>{{ course.title }}</td>
-    <td>{{ course.program }}</td>
+    <td>{{ course.field_of_study }}</td>
     <td>
         <div class="btn-group" hx-target="#dialog">
             <a href="{{ course.update_url }}" hx-get="{{ course.update_url }}" class="btn btn-warning">

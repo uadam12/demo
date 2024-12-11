@@ -16,15 +16,20 @@
 
 <div class="form-group col-md-6 mb-0">
     <div id="div_id_course_of_study" class="mb-3">
-        <label for="id_course_of_study" class="form-label requiredField">
-            Course of study<span class="asteriskField">*</span>
+        <label for="id_field_of_study" class="form-label requiredField">
+            Field of study<span class="asteriskField">*</span>
         </label>
 
-        <select name="course_of_study" class="select form-select" required="" id="id_course_of_study">
-            <option selected disabled>Select your course of study</option>
+        <select name="field_of_study" 
+            class="select form-select" 
+            required="" id="id_field_of_study"
+            hx-get="{% url 'academic:field-of-study' %}"
+            h-trigger="change"
+            hx-target="#id_course_of_study">
+            <option selected disabled>Select your field of study</option>
 
-            {% for course in courses %}
-            <option value="{{ course.pk }}">{{ course }}</option>
+            {% for field_of_study in field_of_studies %}
+            <option value="{{ field_of_study.pk }}">{{ field_of_study }}</option>
             {% endfor %}
         </select>
     </div>

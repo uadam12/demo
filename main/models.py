@@ -1,7 +1,6 @@
 from django.db import models
-from django.db.models import Q
-from django.utils import timezone
 from django.urls import reverse, reverse_lazy
+from app import compress
 from users.models import User
 
 
@@ -32,6 +31,13 @@ class Article(models.Model):
     def contents(self):
         res = self.content.split('\n')
         return [i.strip() for i in res]
+    
+    def save(self, *args, **kwargs):
+        try:
+            self.picture = compress(self.headline_image)
+        except: pass
+        
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.headline

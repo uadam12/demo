@@ -50,10 +50,32 @@ class Level(models.Model):
     def __str__(self):
         return f"{self.name} - {self.program.name}"
 
+class FieldOfStudy(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    number_of_years = models.PositiveSmallIntegerField(default=4)
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='field_of_studies')
+    list_url = reverse_lazy('academic:field-of-studies')
+    url = reverse_lazy('academic:field-of-study')
+
+    @property
+    def update_url(self):
+        return reverse('academic:update-field-of-study', kwargs={'id':self.pk})
+    
+    @property
+    def delete_url(self):
+        return reverse('academic:delete-field-of-study', kwargs={'id':self.pk})
+
+    class Meta:
+        verbose_name = "program"
+        verbose_name_plural = "programs"
+        ordering = ("name", )
+
+    def __str__(self):
+        return self.name
 
 class Course(models.Model):
     title = models.CharField(max_length=255)
-    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='courses')
+    field_of_study = models.ForeignKey(FieldOfStudy, on_delete=models.CASCADE, related_name='courses')
     list_url = reverse_lazy('academic:courses')
 
     @property
@@ -70,8 +92,8 @@ class Course(models.Model):
         ordering = ("title", )
         constraints = [
             models.UniqueConstraint(
-                fields=['title', 'program'],
-                name='unique_course_per_program',
+                fields=['title', 'field_of_study'],
+                name='unique_course_per_field_of_study',
             )
         ]
 

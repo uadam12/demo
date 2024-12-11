@@ -127,13 +127,16 @@
 </section>
 {% endif %}
 
+{% if board.about %}
 <section class="py-5">
     <div class="container">
         <h2 class="text-center text-success mb-4">About US</h2>
-        <p class="text-center">{{ board.info }}</p>
+        <p class="text-center">{{ board.about.splitlines.0 }}</p>
     </div>
 </section>
+{% endif %}
 
+{% if fags %}
 <section class="py-5">
     <div class="container">
         <h2 class="text-center text-success mb-4">Frequently Asked Questions</h2>
@@ -162,4 +165,5 @@
         </div>
     </div>
 </section>
+{% endif %}
 {% endblock content %}

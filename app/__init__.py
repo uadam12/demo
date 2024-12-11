@@ -1,7 +1,17 @@
+from io import BytesIO
+from PIL import Image
 from django.shortcuts import render as render_template
 from django.template.context_processors import csrf
-from crispy_forms.utils import render_crispy_form
 from django.http import HttpResponse
+from django.core.files import File
+from crispy_forms.utils import render_crispy_form
+
+def compress(image):
+    im = Image.open(image)
+    im_io = BytesIO() 
+    im.save(im_io, 'JPEG', quality=60) 
+    new_image = File(im_io, name=image.name)
+    return new_image
 
 
 def get_or_none(model, *args, **kwargs):

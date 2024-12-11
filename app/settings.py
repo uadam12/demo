@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_filters', 'crispy_forms', 'crispy_bootstrap5',
     'board', 'payment', 'users', 'main', 'support',
-    'academic', 'scholarship', 'applicant',
+    'academic', 'scholarship', 'applicant', #'auth',
 ]
 
 MIDDLEWARE = [

@@ -15,7 +15,7 @@ class BoardForm(forms.ModelForm):
         fields = (
             "motto", "registration_fee", 
             "about", "registration_criteria", 
-            "registration_is_open", "new_applicant_can_apply"
+            "registration_is_open"
         )
 
 

@@ -3,22 +3,14 @@ from django.urls import reverse_lazy, reverse
 from django.core.validators import RegexValidator
 
 default_motto = 'Supporting Education, Inspiring Excellence'
-default_about = [
-    "The State Scholarship Board is an essential governmental body dedicated to promoting higher education and ensuring that financial barriers do not hinder talented students from pursuing their academic goals. Established in [Year], the Board offers a variety of merit-based, need-based, and special-purpose scholarships to eligible students within the state. Its mission is to identify and support individuals with exceptional potential who demonstrate academic excellence, community involvement, and leadership skills.",
-    "The Board administers scholarships for undergraduate and graduate programs in fields such as science, engineering, arts, business, and education. In addition to academic achievements, the scholarship selection process takes into consideration extracurricular activities, volunteer work, and personal statements.",
-    "Each year, thousands of students benefit from the scholarship opportunities provided by the Board, allowing them to access higher education without the burden of overwhelming debt. The State Scholarship Board also partners with local schools, universities, and other educational institutions to raise awareness about the scholarships and assist students in navigating the application process.",
-    "For students seeking to apply for financial assistance, the State Scholarship Board offers comprehensive resources, including application guidelines, deadlines, and tips for creating a competitive scholarship portfolio. Students can access the Board’s website to find detailed information on available scholarships, eligibility criteria, and the application process.",
-    "By supporting educational opportunities, the State Scholarship Board plays a crucial role in shaping the future workforce and fostering a thriving, educated community.",
-]
 
 
 # Create your models here.
 class Board(models.Model):
     motto = models.CharField(max_length=100, default=default_motto)
     registration_is_open = models.BooleanField(default=True)
-    new_applicant_can_apply = models.BooleanField(default=True)
     registration_criteria = models.TextField(null=True, blank=True)
-    about = models.TextField(default='\n'.join(default_about))
+    about = models.TextField(default=None, null=True, blank=True)
     registration_fee = models.DecimalField(max_digits=10, default=5000.00, decimal_places=2)
     list_url = reverse_lazy('board:index')
 
