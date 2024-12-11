@@ -25,8 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-k=qb^4e*jji6+p2p1!jpxnz=pz92+h@(ihw78-sf3#4vt*j0u5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = not False
-ALLOWED_HOSTS = ['usimam12.pythonanywhere.com', 'localhost']
+DEBUG = False
+ALLOWED_HOSTS = ['usimam12.pythonanywhere.com', 'www.bssb.bo.gov.ng', 'bssb.bo.gov.ng', 'localhost']
 
 
 
